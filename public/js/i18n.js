@@ -833,6 +833,8 @@
 
   function openRecommendationDialog(recommendation) {
     if (!recommendation || recommendation.locale === 'es') return;
+    // Entrada desde el QR del comprobante en celular: no se interrumpe la consulta (public-app.js).
+    if (window.DovelaEntradaQrMovil) return;
     const dialog = document.getElementById('i18n-language-dialog');
     if (!dialog) return;
     updateRecommendation(recommendation.locale);

@@ -2813,10 +2813,18 @@ function volverDeConsultaReclamo(){
 
 /* Entrada desde el QR del comprobante: ?reclamo=SGP-… abre la consulta con el código precargado
    y deja el foco en la cédula, que el asegurado sigue escribiendo como comprobación. */
+function esContextoMovil(){
+  if(navigator.userAgentData && typeof navigator.userAgentData.mobile === 'boolean') return navigator.userAgentData.mobile;
+  return matchMedia('(pointer: coarse)').matches && matchMedia('(max-width: 900px)').matches;
+}
+
 function abrirConsultaDesdeEnlace(){
   let codigo;
   try { codigo = new URLSearchParams(location.search).get(PARAMETRO_SEGUIMIENTO); } catch(_) { return; }
   if(!codigo) return;
+  // En celular, quien escanea el QR va directo a la consulta: ni el tutorial de ingreso ni el
+  // diálogo de idioma se abren solos (siguen disponibles desde el menú).
+  if(esContextoMovil()) window.DovelaEntradaQrMovil = true;
   // Se retira el parámetro para que recargar o compartir la URL no reabra la consulta.
   const url = new URL(location.href);
   url.searchParams.delete(PARAMETRO_SEGUIMIENTO);
@@ -3788,5 +3796,6 @@ document.addEventListener('dovela:languagechange', () => {
   });
   // Ingreso nuevo al portal: se muestra solo. El diálogo de idioma se programa a los 450 ms;
   // el tutorial espera a que se cierre si aparece.
-  if (!alreadyInSite) setTimeout(() => tour.open(), 1200);
+  // Excepción: entrada desde el QR del comprobante en celular (ver abrirConsultaDesdeEnlace).
+  if (!alreadyInSite && !window.DovelaEntradaQrMovil) setTimeout(() => tour.open(), 1200);
 })();
