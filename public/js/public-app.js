@@ -984,13 +984,22 @@ if(btnPDF){
 /* ================= QR DE SEGUIMIENTO DEL COMPROBANTE ================= */
 const PARAMETRO_SEGUIMIENTO = 'reclamo';
 
+/* Dirección pública del portal. El QR siempre apunta aquí y no a location.origin: un comprobante
+   generado en local (localhost, 127.0.0.1, file://) o en un deploy de preview de Vercel (protegido
+   con login) llevaría al celular a una dirección que no puede abrir. */
+const URL_PUBLICA_PORTAL = 'https://dovelaseguros.vercel.app/';
+
 /* URL que abre la consulta de estado con el código precargado. La cédula nunca viaja en el QR:
-   sigue siendo el segundo factor que el asegurado escribe en su celular. Fuera de http(s)
-   (p. ej. file://) no hay una dirección que un celular pueda abrir, así que no se genera QR. */
+   sigue siendo el segundo factor que el asegurado escribe en su celular. El idioma del comprobante
+   viaja como ?lang= para que el portal abra en ese idioma sin mostrar el diálogo de idioma
+   encima de la consulta. */
 function urlSeguimientoReclamo(codigo){
-  if(!codigo || !/^https?:$/.test(location.protocol)) return null;
-  const url = new URL(location.pathname, location.origin);
+  codigo = String(codigo || '').trim().toUpperCase();
+  if(!/^SGP-[A-Z0-9-]{4,28}$/.test(codigo)) return null;
+  const url = new URL(URL_PUBLICA_PORTAL);
   url.searchParams.set(PARAMETRO_SEGUIMIENTO, codigo);
+  const idioma = window.DovelaI18n?.locale;
+  if(idioma) url.searchParams.set('lang', idioma);
   return url.href;
 }
 

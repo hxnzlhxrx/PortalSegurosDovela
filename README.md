@@ -82,7 +82,7 @@ Ejemplo: `SGP-26301-0007-M`. El portal interno extrae la fecha de recepción del
 ### Comprobante de recepción (PDF)
 
 - Se genera en el cliente con jsPDF. Incluye la tarjeta principal con radicado, fecha y hora, línea, producto, asegurado, monto y la lista de documentos recibidos.
-- Lleva un **código QR de seguimiento** que abre el portal con la consulta de estado ya cargada.
+- Lleva un **código QR de seguimiento**, único por comprobante, que abre el portal público (`https://dovelaseguros.vercel.app/?reclamo=<radicado>&lang=<idioma>`) con la consulta de estado ya cargada. Siempre apunta al dominio de producción (constante `URL_PUBLICA_PORTAL` en `public/js/public-app.js`), aunque el PDF se genere en local o en un deploy de preview.
 - Usa la paleta de marca en una versión apta para impresión y se descarga en el idioma activo del portal.
 
 ### Pre-autorización médica
