@@ -168,7 +168,7 @@ Los permisos se aplican en dos niveles: la interfaz oculta lo que el rol no pued
 - Datos completos del reclamo y acceso a los documentos cargados por el asegurado.
 - **Gestión**:
   - Cambio de estado.
-  - Monto pagado y monto aplicado a deducible, en balboas (`B/.`). La base de datos no permite montos negativos.
+  - Monto pagado y monto aplicado a deducible. La base de datos no permite montos negativos.
   - Comentario visible para el asegurado, que aparece en la consulta pública.
 - **Asignación** del reclamo a un miembro del equipo. Un *trigger* valida que el destinatario sea personal activo.
 - **Observaciones internas** con capturas adjuntas: hasta 6 imágenes PNG, JPEG, WebP o GIF de máximo 5 MB cada una.
@@ -446,7 +446,7 @@ En Windows, `tests/Run-ClaimStatus.ps1` comprueba la sintaxis de los scripts pú
 ## Convenciones
 
 - Código, comentarios e interfaz en español.
-- Montos del asegurado en USD (`US$`) y montos de gestión interna en balboas (`B/.`).
+- Montos del asegurado en USD (`US$`).
 
 ---
 
