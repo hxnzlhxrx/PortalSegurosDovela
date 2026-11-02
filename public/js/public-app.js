@@ -3652,6 +3652,7 @@ document.addEventListener('dovela:languagechange', () => {
   const dock = document.getElementById('nav-dock');
   const nav = dock?.querySelector('.nav');
   const backToTop = document.getElementById('back-to-top');
+  const footer = document.querySelector('.gishiko-footer');
   if (!landing || !dock || !nav || !backToTop) return;
 
   const reducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)');
@@ -3690,7 +3691,9 @@ document.addEventListener('dovela:languagechange', () => {
     const landingVisible = landing.classList.contains('active');
     const y = window.scrollY || document.documentElement.scrollTop;
     setSticky(landingVisible && y > Math.max(2, naturalNavTop - stickyInset()));
-    setBackVisible(landingVisible && y > backThreshold());
+    // Al llegar al final del sitio el botón se oculta para no tapar el footer (devTag), sobre todo en celular.
+    const footerVisible = Boolean(footer) && footer.getBoundingClientRect().top < window.innerHeight;
+    setBackVisible(landingVisible && y > backThreshold() && !footerVisible);
   };
 
   const requestUpdate = () => {
