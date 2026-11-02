@@ -1,0 +1,204 @@
+/* ==========================================================================
+   PulsePoint palette layer (DESIGN.md) for Dovela Seguros — shared by both portals.
+   Dark base, Primary Navy, Tertiary Steel, alert hierarchy and glow elevation.
+   Glassmorphism and Material 3 Expressive interaction (m3-expressive.css) are preserved.
+   Load after the page stylesheet and before m3-expressive.css.
+   ========================================================================== */
+:root {
+  --sombra: var(--elev-subtle);
+  --shadow-soft: var(--elev-subtle);
+  --shadow-lift: var(--elev-medium);
+  --surface-glass: var(--glass-fill);
+  --surface-edge: var(--glass-edge);
+  --glass-inset: var(--glass-highlight);
+  --glass-dark: rgb(10 18 34 / .9);
+}
+body {
+  background:
+    radial-gradient(circle at 8% 12%, rgb(59 130 246 / .10), transparent 30rem),
+    radial-gradient(circle at 92% 40%, rgb(30 58 95 / .55), transparent 34rem),
+    var(--surface-base);
+  color: var(--text-secondary);
+}
+
+/* ---------- Public home ---------- */
+#v-landing {
+  --home-ink: var(--text-primary);
+  --home-ink-soft: var(--text-secondary);
+  --home-muted: var(--text-muted);
+  --home-surface-0: var(--surface-base);
+  --home-surface-1: #0D1526;
+  --home-surface-2: var(--glass-fill);
+  --home-surface-3: var(--surface-elevated);
+  --home-edge: var(--glass-edge);
+  --home-edge-strong: rgb(148 163 184 / .3);
+  --home-shadow-1: var(--elev-subtle);
+  --home-shadow-2: var(--elev-medium), var(--glow-info);
+  --home-shadow-3: var(--elev-large);
+  background:
+    radial-gradient(ellipse 60% 26% at 82% 50%, rgb(59 130 246 / .10), transparent 80%),
+    radial-gradient(ellipse 70% 28% at 12% 86%, rgb(30 58 95 / .5), transparent 78%),
+    linear-gradient(180deg, var(--home-surface-0), var(--home-surface-1) 66%, var(--surface-base));
+  color: var(--text-secondary);
+}
+#v-landing .header-pub { background: linear-gradient(117deg, var(--brand-primary-deep) 6%, var(--brand-primary) 62%, var(--brand-primary-hover) 100%); }
+#v-landing .header-pub::after { background: radial-gradient(ellipse at 68% 50%, rgb(59 130 246 / .22), transparent 62%); }
+#v-landing .header-pub .onda path:last-of-type { fill: #3B82F6; fill-opacity: .3; }
+#v-landing .nav { background: rgb(15 23 42 / .35); border-color: rgb(148 163 184 / .22); box-shadow: var(--elev-medium), inset 0 1px rgb(255 255 255 / .06); }
+#v-landing .hero .kicker { color: var(--brand-tide-soft); }
+#v-landing .hero .kicker span { background: var(--brand-tide); box-shadow: 0 0 10px rgb(59 130 246 / .8); }
+#v-landing .hero h1 { color: var(--text-primary); }
+#v-landing .hero h1 em { color: var(--brand-secondary); text-shadow: 0 0 32px rgb(59 130 246 / .35); }
+#v-landing .hero > p:not(.kicker) { color: var(--text-secondary); }
+#v-landing .hero-link { color: var(--text-primary); border-color: rgb(96 165 250 / .7); }
+#v-landing .hero-link:hover { color: var(--brand-secondary); border-color: var(--brand-secondary); }
+
+/* Glass surfaces on dark: translucent fill, hairline edge, top highlight, navy glow. */
+#v-landing .banner-slide,
+#v-landing .card-acc,
+#v-landing .form-card,
+#v-landing .paso {
+  background: linear-gradient(150deg, rgb(30 41 59 / .8), rgb(23 42 69 / .66));
+  border-color: var(--glass-edge);
+  box-shadow: var(--elev-medium), var(--glass-highlight);
+  color: var(--text-secondary);
+}
+#v-landing .banner-slide { box-shadow: var(--elev-large), var(--glass-highlight); }
+#v-landing :where(.banner-slide h2, .card-title, .form-card h3, .paso h3, .section-heading h2) { color: var(--text-primary); }
+#v-landing .banner-slide p:not(.banner-label), #v-landing .card-acc .card-desc, #v-landing .form-card p, #v-landing .paso p, #v-landing .section-heading > p:not(.eyebrow) { color: var(--text-secondary); }
+#v-landing .banner-label, #v-landing .eyebrow, #v-landing .section-heading .eyebrow, #v-landing .card-kicker, #v-landing .paso .num { color: var(--brand-secondary); }
+#v-landing .banner-dots button::before { background: var(--border-strong); }
+#v-landing .banner-dots button[aria-current="true"]::before { background: var(--brand-tide); box-shadow: 0 0 10px rgb(59 130 246 / .7); }
+#v-landing .banner-pause { color: var(--text-muted); }
+#v-landing .banner-pause:hover { color: var(--text-primary); }
+#v-landing .emergencia { background: linear-gradient(112deg, var(--brand-primary-deep), var(--brand-primary)); border-color: rgb(230 57 70 / .35); box-shadow: var(--elev-large); }
+#v-landing .emergencia .icono { background: rgb(230 57 70 / .16); color: var(--error); box-shadow: 0 0 16px rgb(230 57 70 / .35); }
+/* Critical red, lifted to #FF8A93 so it holds 5.1:1 across the navy gradient. */
+#v-landing .emergencia .eyebrow { color: #FF8A93; }
+#v-landing .emergencia h2 { color: var(--text-primary); }
+#v-landing .emergencia p:not(.eyebrow), #v-landing .emergencia b.tel { color: var(--text-secondary); }
+#v-landing .emergencia b { color: var(--text-primary); }
+#v-landing .footer-pub { background: var(--brand-primary-deep); border-top: 1px solid var(--glass-edge); }
+
+/* ---------- Buttons (DESIGN.md): Primary navy + glow; accent CTA info blue with dark text ---------- */
+.btn-azul, #v-landing .btn-azul, #v-landing .btn-primary { background: var(--brand-primary); border-color: rgb(96 165 250 / .45); color: var(--text-on-dark); box-shadow: var(--elev-subtle); }
+.btn-azul:hover, #v-landing .btn-azul:hover, #v-landing .btn-primary:hover { background: var(--brand-primary-hover); border-color: var(--brand-secondary); color: #fff; box-shadow: var(--glow-info); }
+.btn-verde, #v-landing .btn-verde { background: var(--brand-accent); border-color: var(--brand-accent); color: var(--text-on-accent); }
+.btn-verde:hover, #v-landing .btn-verde:hover { background: var(--brand-accent-hover); border-color: var(--brand-accent-hover); color: var(--text-on-accent); box-shadow: var(--glow-info); }
+.btn-ghost, #v-landing .btn-ghost, #v-landing .btn-tertiary { background: transparent; border-color: var(--border-strong); color: var(--text-secondary); }
+.btn-ghost:hover, #v-landing .btn-ghost:hover, #v-landing .btn-tertiary:hover { background: var(--surface-elevated); border-color: var(--text-muted); color: var(--text-primary); }
+#v-landing .btn-secondary { background: #334155; border-color: var(--border-strong); color: var(--text-secondary); }
+#v-landing .btn-secondary:hover { background: #475569; color: var(--text-primary); }
+/* Destructive: DESIGN.md red, deepened so white text reaches 4.5:1; alert glow. */
+.btn-rojo { background: #C42B37; color: #fff; box-shadow: var(--elev-alert); }
+.btn-link, #v-landing .btn-link { color: var(--brand-secondary); }
+.chip-esp { background: #334155; color: var(--text-secondary); box-shadow: inset 0 0 0 1px #475569; }
+.chip-esp:hover, .chip-esp.on { background: var(--brand-primary); color: var(--text-on-dark); box-shadow: inset 0 0 0 1px var(--brand-tide), 0 0 12px rgb(59 130 246 / .35); }
+
+/* ---------- Inputs (DESIGN.md): base fill, slate border, blue focus, red error glow ---------- */
+input, select, textarea { background: var(--surface-base); border-color: var(--border-strong); color: var(--text-primary); }
+input::placeholder, textarea::placeholder { color: var(--text-muted); opacity: 1; }
+input:hover:not(:disabled), select:hover:not(:disabled), textarea:hover:not(:disabled) { border-color: var(--text-muted); }
+input:focus, select:focus, textarea:focus { border-color: var(--brand-tide); box-shadow: 0 0 0 3px rgb(59 130 246 / .25), var(--elev-subtle); }
+input[aria-invalid="true"], select[aria-invalid="true"], textarea[aria-invalid="true"] { border-color: var(--error-fill); box-shadow: var(--elev-alert); }
+select option { background: var(--surface-elevated); color: var(--text-primary); }
+label { color: var(--text-secondary); }
+
+/* ---------- Shared panels, tiles and feedback ---------- */
+.panel, .ticket, .servicio-card, .tipo, .modal, .login-panel, .tarjeta, .kpi {
+  background: var(--glass-fill); border-color: var(--glass-edge); color: var(--text-secondary);
+  box-shadow: var(--elev-medium), var(--glass-highlight);
+}
+:where(.panel, .ticket, .modal, .login-panel, .tarjeta, .kpi, .main) :where(h1, h2, h3, h4) { color: var(--text-primary); }
+.tipo.sel, .servicio-card.sel { background: rgb(30 58 95 / .6); border-color: var(--brand-tide); box-shadow: 0 0 0 2px rgb(59 130 246 / .35), var(--glow-info); }
+.volver { color: var(--brand-secondary); }
+.ayuda, .sub, .main .sub { color: var(--text-muted); }
+.stepper .st { color: var(--text-muted); }
+.stepper .st.actual { color: var(--text-primary); }
+.stepper .st::before { background: var(--surface-base); border-color: var(--border-strong); }
+.stepper .st.actual::before { background: var(--brand-tide); border-color: var(--brand-tide); box-shadow: 0 0 12px rgb(59 130 246 / .7); }
+.stepper .st.hecho::before { background: var(--success-fill); border-color: var(--success-fill); }
+.doc, .resumen, .tips-foto, .aviso-inline { background-color: rgb(30 41 59 / .55); border-color: var(--glass-edge); color: var(--text-secondary); }
+.doc.ok { background: var(--success-soft); border-color: var(--success-fill); }
+.toast { background: rgb(10 18 34 / .92); color: var(--text-primary); border-color: var(--glass-edge); box-shadow: var(--elev-overlay); }
+table { color: var(--text-secondary); }
+th { color: var(--text-secondary); }
+.tabla-scroll { background: rgb(15 23 42 / .5); border-color: var(--border-subtle); }
+.tabla-scroll th { background: rgb(30 58 95 / .45); color: var(--text-secondary); }
+.tabla-scroll td { border-bottom-color: var(--border-subtle); }
+tr.fila:hover { background: rgb(59 130 246 / .08); }
+
+/* Status chips (DESIGN.md): 15% fill, 30% border, light tone text. */
+.b-verde { background: var(--success-soft); color: var(--success); box-shadow: inset 0 0 0 1px rgb(34 197 94 / .3); }
+.b-rojo { background: var(--error-soft); color: var(--error); box-shadow: inset 0 0 0 1px rgb(230 57 70 / .3); }
+.b-azul { background: var(--info-soft); color: var(--info); box-shadow: inset 0 0 0 1px rgb(59 130 246 / .3); }
+.b-ambar, .b-amarillo { background: var(--warning-soft); color: var(--warning); box-shadow: inset 0 0 0 1px rgb(245 158 11 / .3); }
+.b-gris { background: var(--pending-soft); color: var(--pending); box-shadow: inset 0 0 0 1px rgb(141 153 174 / .3); }
+
+/* ---------- Internal workspace ---------- */
+.login-fondo { background: radial-gradient(circle at 75% 20%, rgb(59 130 246 / .18), transparent 40%), linear-gradient(150deg, var(--brand-primary-deep), var(--brand-primary)); }
+.login-panel { background: rgb(15 23 42 / .82); }
+.login-panel .sub-marca { color: var(--brand-secondary); }
+.login-panel p, .login-demo-note { color: var(--text-secondary); }
+.sidebar { background: linear-gradient(170deg, var(--brand-primary-deep), #0F1C33); border-right: 1px solid var(--glass-edge); }
+.sidebar .item { color: var(--text-secondary); }
+.sidebar .item:hover { background: rgb(59 130 246 / .1); color: var(--text-primary); }
+.sidebar .item.on { background: var(--brand-primary); color: var(--text-primary); box-shadow: var(--elev-subtle); }
+.marca-side { background: rgb(30 58 95 / .35); box-shadow: inset 0 1px rgb(255 255 255 / .06); }
+.main { color: var(--text-secondary); }
+.subtabs { background: rgb(15 23 42 / .5); border-color: var(--border-subtle); }
+.subtab { color: var(--text-muted); }
+.subtab:hover { background: rgb(59 130 246 / .1); color: var(--text-primary); }
+.subtab.on { background: var(--brand-primary); color: var(--text-primary); }
+
+/* Developer credit keeps its intentional low-key reveal. */
+.gishiko-footer { color: var(--text-muted); }
+
+/* ==========================================================================
+   Multicolour accents from DESIGN.md (Info blue, Success green, Warning amber, Steel).
+   Each element owns one hue: tinted glass, icon, kicker, link and a same-hue glow on
+   hover. No neon tab borders. Red stays reserved for critical / emergency content.
+   Accent text tones on dark glass: #60A5FA 5.7:1 · #4ADE80 8.4:1 · #FBBF24 8.8:1.
+   ========================================================================== */
+#v-landing .cards-acceso > :nth-child(1), #v-landing .forms-grid > :nth-child(1), #v-landing .pasos > :nth-child(1),
+#v-landing .banner-slide[data-tone="info"] { --acc: #3B82F6; --acc-text: #60A5FA; --acc-rgb: 59 130 246; }
+#v-landing .cards-acceso > :nth-child(2), #v-landing .forms-grid > :nth-child(2), #v-landing .pasos > :nth-child(2),
+#v-landing .banner-slide[data-tone="success"] { --acc: #22C55E; --acc-text: #4ADE80; --acc-rgb: 34 197 94; }
+#v-landing .cards-acceso > :nth-child(3), #v-landing .pasos > :nth-child(3),
+#v-landing .banner-slide[data-tone="warning"] { --acc: #F59E0B; --acc-text: #FBBF24; --acc-rgb: 245 158 11; }
+
+#v-landing :where(.card-acc, .form-card, .paso, .banner-slide) {
+  background:
+    radial-gradient(120% 90% at 100% 0%, rgb(var(--acc-rgb, 59 130 246) / .16), transparent 55%),
+    linear-gradient(150deg, rgb(30 41 59 / .82), rgb(23 42 69 / .66));
+}
+#v-landing .card-acc::before, #v-landing .banner-slide::before { content: none; }
+#v-landing .card-acc .icono { background: rgb(var(--acc-rgb) / .15); color: var(--acc-text); box-shadow: inset 0 0 0 1px rgb(var(--acc-rgb) / .32); }
+#v-landing .card-acc .card-kicker, #v-landing .card-acc .ir, #v-landing .paso .num, #v-landing .banner-slide .banner-label { color: var(--acc-text); }
+#v-landing :where(.card-acc, .form-card, .paso):hover { border-color: rgb(var(--acc-rgb) / .5); box-shadow: var(--elev-medium), 0 0 0 1px rgb(var(--acc-rgb) / .35), 0 0 24px rgb(var(--acc-rgb) / .22); }
+#v-landing .form-icon { background: rgb(var(--acc-rgb) / .14); border-color: rgb(var(--acc-rgb) / .35); color: var(--acc-text); }
+#v-landing .paso::before { content: none; } /* step hue lives in the tint and the PASO label */
+/* Banner CTA takes the slide hue (dark text: 4.85:1 blue · 7.83:1 green · 8.31:1 amber). */
+#v-landing .banner-slide .btn-verde { background: var(--acc); border-color: var(--acc); color: var(--text-on-accent); }
+#v-landing .banner-slide .btn-verde:hover { background: var(--acc-text); border-color: var(--acc-text); box-shadow: 0 0 22px rgb(var(--acc-rgb) / .45); }
+#v-landing .banner-dots button[aria-current="true"]::before { background: linear-gradient(90deg, #3B82F6, #22C55E, #F59E0B); box-shadow: none; }
+
+/* Section eyebrows rotate through the palette. */
+#v-landing #servicios .eyebrow { color: #60A5FA; }
+#v-landing #sec-formularios .eyebrow { color: #4ADE80; }
+#v-landing .seccion--steps .eyebrow { color: #FBBF24; }
+#v-landing .hero .kicker span { background: #22C55E; box-shadow: none; }
+#v-landing .footer-principles div:nth-child(1) dt { color: #4ADE80; }
+#v-landing .footer-principles div:nth-child(2) dt { color: #60A5FA; }
+
+/* Internal KPIs: each tone from DESIGN.md (tinted glass + coloured value). */
+.kpi { background: linear-gradient(150deg, rgb(30 41 59 / .82), rgb(23 42 69 / .66)); }
+.kpi.acento { background: radial-gradient(120% 100% at 100% 0%, rgb(59 130 246 / .2), transparent 60%), var(--glass-fill); }
+.kpi.acento .v { color: #60A5FA; }
+.kpi.ambar { background: radial-gradient(120% 100% at 100% 0%, rgb(245 158 11 / .2), transparent 60%), var(--glass-fill); }
+.kpi.ambar .v { color: #FBBF24; }
+.kpi.verde { background: radial-gradient(120% 100% at 100% 0%, rgb(34 197 94 / .2), transparent 60%), var(--glass-fill); }
+.kpi.verde .v { color: #4ADE80; }
+.kpi.rojo { background: radial-gradient(120% 100% at 100% 0%, rgb(230 57 70 / .2), transparent 60%), var(--glass-fill); }
+.kpi.rojo .v { color: #FF8A93; }
+.kpi .l { color: var(--text-secondary); }

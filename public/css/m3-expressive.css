@@ -1,0 +1,169 @@
+/* ==========================================================================
+   Material 3 Expressive — interaction states (hover / focus / pressed)
+   Shared by the public portal and the internal workspace. Load LAST.
+
+   - State layers: currentColor at 8% (hover), 10% (focus, pressed), painted
+     with an inset box-shadow so no pseudo-element or positioning is needed.
+   - Spatial motion uses an overshooting spring curve; effects (colour,
+     shadow) use a non-overshooting curve.
+   - Pressed state morphs the shape (rounder -> squarer) and compresses.
+   - Hover effects only apply to real hover pointers, pressed always applies.
+   - The ":root:not(#m3)" prefix lifts specificity above the page-scoped
+     rules (e.g. "#v-landing .btn") without !important.
+   ========================================================================== */
+
+:root {
+  --m3-spring: cubic-bezier(.42, 1.67, .21, .9);       /* fast spatial, small overshoot */
+  --m3-spring-soft: cubic-bezier(.38, 1.21, .22, 1);   /* default spatial, subtle overshoot */
+  --m3-shape-ease: cubic-bezier(.2, .8, .2, 1);        /* no overshoot: radii never collapse to square */
+  --m3-effects: cubic-bezier(.31, .94, .34, 1);        /* colour / shadow / opacity */
+  --m3-dur-spatial: 360ms;
+  --m3-dur-effects: 180ms;
+  --m3-layer-hover: 8%;
+  --m3-layer-focus: 10%;
+  --m3-layer-press: 10%;
+  --m3-press-scale: .96;
+  --m3-press-radius: 7px;
+}
+
+/* ---------- Buttons (.btn and variants, excluding text links) ---------- */
+:root:not(#m3) .btn:not(.btn-link):not(:disabled):not([aria-disabled="true"]):not([aria-busy="true"]) {
+  --m3-layer: transparent;
+  --m3-elev: 0 0 0 0 transparent;
+  box-shadow: var(--m3-elev), inset 0 0 0 999px var(--m3-layer);
+  transition:
+    transform var(--m3-dur-spatial) var(--m3-spring),
+    border-radius var(--m3-dur-spatial) var(--m3-shape-ease),
+    box-shadow var(--m3-dur-effects) var(--m3-effects),
+    background-color var(--m3-dur-effects) var(--m3-effects),
+    border-color var(--m3-dur-effects) var(--m3-effects),
+    color var(--m3-dur-effects) var(--m3-effects);
+}
+:root:not(#m3) .btn:not(.btn-link):not(:disabled):not([aria-disabled="true"]):not([aria-busy="true"]):focus-visible {
+  --m3-layer: color-mix(in srgb, currentColor var(--m3-layer-focus), transparent);
+}
+:root:not(#m3) .btn:not(.btn-link):not(:disabled):not([aria-disabled="true"]):not([aria-busy="true"]):active {
+  --m3-layer: color-mix(in srgb, currentColor var(--m3-layer-press), transparent);
+  --m3-elev: 0 0 0 0 transparent;
+  transform: scale(var(--m3-press-scale));
+  border-radius: var(--m3-press-radius);
+}
+.btn-link:active:not(:disabled) { opacity: .72; transition: opacity var(--m3-dur-effects) var(--m3-effects); }
+
+/* ---------- Clickable surfaces (cards, selectable tiles) ---------- */
+:root:not(#m3) :is(.card-acc, .servicio-card, .tipo) {
+  transition:
+    transform var(--m3-dur-spatial) var(--m3-spring-soft),
+    border-radius var(--m3-dur-spatial) var(--m3-shape-ease),
+    box-shadow var(--m3-dur-effects) var(--m3-effects),
+    border-color var(--m3-dur-effects) var(--m3-effects),
+    background-color var(--m3-dur-effects) var(--m3-effects);
+}
+:root:not(#m3) :is(.card-acc, .servicio-card, .tipo):active {
+  transform: translateY(0) scale(.975);
+  border-radius: 16px;
+  box-shadow: 0 2px 8px rgb(var(--brand-primary-rgb) / .10), var(--glass-highlight);
+}
+:root:not(#m3) .card-acc:active .ir { transform: translateX(8px); }
+
+/* ---------- Chips ---------- */
+:root:not(#m3) .chip-esp {
+  transition:
+    transform var(--m3-dur-spatial) var(--m3-spring),
+    border-radius var(--m3-dur-spatial) var(--m3-shape-ease),
+    background-color var(--m3-dur-effects) var(--m3-effects),
+    color var(--m3-dur-effects) var(--m3-effects);
+}
+:root:not(#m3) .chip-esp:active { transform: scale(.94); border-radius: 8px; }
+
+/* ---------- Home: hero link, banner controls, quiet lock ---------- */
+:root:not(#m3) .hero-link {
+  transform-origin: left center;
+  transition: transform var(--m3-dur-spatial) var(--m3-spring), border-color var(--m3-dur-effects) var(--m3-effects), color var(--m3-dur-effects) var(--m3-effects);
+}
+:root:not(#m3) .hero-link:active { transform: scale(.97); }
+
+:root:not(#m3) .banner-dots button {
+  border-radius: 50%;
+  transition: transform var(--m3-dur-spatial) var(--m3-spring), background-color var(--m3-dur-effects) var(--m3-effects);
+}
+:root:not(#m3) .banner-dots button:active { transform: scale(.85); background-color: rgb(var(--brand-secondary-rgb) / .14); }
+:root:not(#m3) .banner-pause {
+  border-radius: 12px;
+  transition: transform var(--m3-dur-spatial) var(--m3-spring), background-color var(--m3-dur-effects) var(--m3-effects), color var(--m3-dur-effects) var(--m3-effects);
+}
+:root:not(#m3) .banner-pause:active { transform: scale(.94); background-color: rgb(var(--brand-secondary-rgb) / .12); }
+
+:root:not(#m3) :is(.btn-portal, .btn-home) {
+  transition:
+    transform var(--m3-dur-spatial) var(--m3-spring),
+    border-radius var(--m3-dur-spatial) var(--m3-shape-ease),
+    background-color var(--m3-dur-effects) var(--m3-effects),
+    border-color var(--m3-dur-effects) var(--m3-effects),
+    color var(--m3-dur-effects) var(--m3-effects);
+}
+/* The circular lock morphs to a rounded square while pressed. */
+:root:not(#m3) #v-landing .btn-portal:active,
+:root:not(#m3) :is(.btn-portal, .btn-home):active { transform: scale(.92); }
+:root:not(#m3) #v-landing .btn-portal:active { border-radius: 14px; }
+
+/* ---------- Internal workspace: sidebar, tabs, rows ---------- */
+:root:not(#m3) .sidebar .item {
+  transition:
+    transform var(--m3-dur-spatial) var(--m3-spring),
+    border-radius var(--m3-dur-spatial) var(--m3-shape-ease),
+    background-color var(--m3-dur-effects) var(--m3-effects),
+    box-shadow var(--m3-dur-effects) var(--m3-effects);
+}
+:root:not(#m3) .sidebar .item:not(.on):active { background: rgba(255, 255, 255, .22); transform: translateX(2px) scale(.97); border-radius: 10px; }
+:root:not(#m3) .sidebar .item.on:active { transform: scale(.98); border-radius: 12px; }
+
+:root:not(#m3) .subtab {
+  transition: background-color var(--m3-dur-effects) var(--m3-effects), color var(--m3-dur-effects) var(--m3-effects), transform var(--m3-dur-spatial) var(--m3-spring), border-radius var(--m3-dur-spatial) var(--m3-shape-ease);
+}
+:root:not(#m3) .subtab:active { background: rgb(var(--brand-tide-rgb) / .16); transform: scale(.97); border-radius: 8px 8px 6px 6px; }
+
+:root:not(#m3) tr.fila { transition: background-color var(--m3-dur-effects) var(--m3-effects); }
+:root:not(#m3) tr.fila:active { background: rgb(var(--brand-tide-rgb) / .14); }
+
+/* ---------- Text fields: focus ring that grows in ---------- */
+:root:not(#m3) :is(input:not([type="checkbox"]):not([type="radio"]):not([type="file"]):not([type="range"]), select, textarea) {
+  transition: border-color var(--m3-dur-effects) var(--m3-effects), box-shadow var(--m3-dur-spatial) var(--m3-spring-soft), background-color var(--m3-dur-effects) var(--m3-effects);
+}
+:root:not(#m3) :is(input:not([type="checkbox"]):not([type="radio"]):not([type="file"]):not([type="range"]), select, textarea):focus-visible {
+  border-color: var(--azul-osc);
+  box-shadow: 0 0 0 4px rgb(var(--brand-secondary-rgb) / .16), inset 0 1px 2px rgb(var(--brand-primary-rgb) / .025);
+}
+
+/* ---------- Hover (real pointers only; avoids sticky hover on touch) ---------- */
+@media (hover: hover) and (pointer: fine) {
+  :root:not(#m3) .btn:not(.btn-link):not(:disabled):not([aria-disabled="true"]):not([aria-busy="true"]):hover {
+    --m3-layer: color-mix(in srgb, currentColor var(--m3-layer-hover), transparent);
+    --m3-elev: 0 6px 16px rgb(var(--brand-primary-rgb) / .14);
+    transform: translateY(-1px);
+  }
+  :root:not(#m3) .btn:not(.btn-link):not(:disabled):not([aria-disabled="true"]):not([aria-busy="true"]):active:hover {
+    --m3-layer: color-mix(in srgb, currentColor var(--m3-layer-press), transparent);
+    --m3-elev: 0 0 0 0 transparent;
+    transform: scale(var(--m3-press-scale));
+  }
+  :root:not(#m3) :is(.card-acc, .servicio-card, .tipo):hover { transform: translateY(-4px); }
+  :root:not(#m3) :is(.card-acc, .servicio-card, .tipo):active:hover { transform: translateY(0) scale(.975); }
+  :root:not(#m3) .chip-esp:hover { transform: translateY(-1px); }
+  :root:not(#m3) .chip-esp:active:hover { transform: scale(.94); }
+  :root:not(#m3) .banner-dots button:hover { background-color: rgb(var(--brand-secondary-rgb) / .08); }
+  :root:not(#m3) .banner-pause:hover { background-color: rgb(var(--brand-secondary-rgb) / .08); }
+  :root:not(#m3) #v-landing .btn-portal:hover { transform: scale(1.06); }
+  :root:not(#m3) #v-landing .btn-portal:active:hover { transform: scale(.92); }
+  :root:not(#m3) .subtab:hover { background-color: rgb(var(--brand-tide-rgb) / .1); }
+}
+
+/* ---------- Reduced motion: keep colour feedback, drop movement and morphing ---------- */
+@media (prefers-reduced-motion: reduce) {
+  :root:not(#m3) :is(.btn, .card-acc, .servicio-card, .tipo, .chip-esp, .hero-link, .banner-dots button, .banner-pause, .btn-portal, .btn-home, .sidebar .item, .subtab):is(:hover, :active) {
+    transform: none !important;
+  }
+  :root:not(#m3) :is(.btn, .card-acc, .servicio-card, .tipo, .chip-esp, .banner-dots button, .banner-pause, .btn-portal, .btn-home, .sidebar .item, .subtab) {
+    transition-duration: .01ms !important;
+  }
+}

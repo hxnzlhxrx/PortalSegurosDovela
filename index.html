@@ -1,0 +1,1017 @@
+<!-- --- </gishikoDev_> 2026 - Hansel Hernandez --- -->
+
+<!DOCTYPE html>
+<html lang="es">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Portal de Autogestión · Dovela Seguros</title>
+  <meta name="description" content="Portal de autogestión de Dovela Seguros: presente reclamos, consulte su estado y encuentre prestadores. Entidad ficticia con fines demostrativos.">
+  <meta name="theme-color" content="#F8FAFC">
+  <meta name="color-scheme" content="light dark">
+  <meta property="og:type" content="website">
+  <meta property="og:site_name" content="Dovela Seguros">
+  <meta property="og:title" content="Portal de Autogestión · Dovela Seguros">
+  <meta property="og:description" content="Reclamos, seguimiento y red de prestadores en un solo lugar. Entidad ficticia con fines demostrativos.">
+  <meta property="og:image" content="public/assets/brand/dovela-icon-512.png">
+  <link rel="icon" href="public/assets/brand/favicon.svg" type="image/svg+xml">
+  <link rel="icon" href="public/assets/brand/favicon.ico" sizes="16x16 32x32 48x48">
+  <link rel="apple-touch-icon" href="public/assets/brand/apple-touch-icon.png">
+  <link rel="preload" href="public/assets/fonts/bricolage-grotesque-latin-opsz-normal.woff2" as="font" type="font/woff2" crossorigin>
+  <link rel="preload" href="public/assets/fonts/fraunces-latin-opsz-normal.woff2" as="font" type="font/woff2" crossorigin>
+
+  <script src="public/js/theme.js"></script>
+  <script src="public/js/iconos.js"></script>
+
+  <link rel="stylesheet" href="public/css/dovela-tokens.css" />
+  <link rel="stylesheet" href="./public/css/public-styles.css" />
+  <link rel="stylesheet" href="public/css/tour.css" />
+  <link rel="stylesheet" href="public/css/preloader.css" />
+  <link rel="stylesheet" href="public/css/pulsepoint-theme.css" />
+  <link rel="stylesheet" href="public/css/featured-glow.css" />
+  <link rel="stylesheet" href="public/css/m3-expressive.css" />
+  <link rel="stylesheet" href="public/css/theme.css" />
+</head>
+
+<body>
+  <div class="brand-preloader" id="brand-preloader" role="status" aria-live="polite" hidden>
+    <div class="brand-preloader__brand">
+      <img class="brand-preloader__logo" src="public/assets/brand/dovela-logo-stacked-dark.svg" data-logo-light="public/assets/brand/dovela-logo-stacked.svg" data-logo-dark="public/assets/brand/dovela-logo-stacked-dark.svg" width="150" height="122" alt="" aria-hidden="true">
+      <p class="brand-preloader__label">Cargando Dovela&hellip;</p>
+      <div class="brand-preloader__track brand-preloader__spinner" aria-hidden="true">
+        <span class="brand-preloader__dot brand-preloader__dot--blue"></span>
+        <span class="brand-preloader__dot brand-preloader__dot--green"></span>
+        <span class="brand-preloader__dot brand-preloader__dot--amber"></span>
+        <span class="brand-preloader__dot brand-preloader__dot--red"></span>
+      </div>
+    </div>
+  </div>
+  <script src="public/js/preloader.js"></script>
+  <script src="public/js/download-guard.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf-autotable/3.8.2/jspdf.plugin.autotable.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcode-generator/1.4.4/qrcode.min.js"></script>
+
+  <div class="toast" id="toast"></div>
+
+  <!-- LANDING -->
+  <div class="view active" id="v-landing">
+    <header class="header-pub">
+      <!-- Background mark: the Dovela arch, viewBox = its tight bbox so the rings stay concentric. -->
+      <svg class="onda" viewBox="6 7.5 52 48.5" aria-hidden="true" focusable="false">
+        <g fill="none" stroke="#fff" vector-effect="non-scaling-stroke">
+          <circle cx="32" cy="31.75" r="31.5" stroke-opacity=".12" stroke-width="1" vector-effect="non-scaling-stroke" />
+          <circle cx="32" cy="31.75" r="42.5" stroke-opacity=".07" stroke-width="1" vector-effect="non-scaling-stroke" />
+          <circle cx="32" cy="31.75" r="55" stroke-opacity=".04" stroke-width="1" vector-effect="non-scaling-stroke" />
+        </g>
+        <path fill="#fff" fill-opacity=".065" d="M6 38A26 26 0 0 1 10.42 23.5L19.55 29.63A15 15 0 0 0 17 38ZM11.54 21.96A26 26 0 0 1 23.06 13.58L26.85 23.91A15 15 0 0 0 20.2 28.74ZM40.94 13.58A26 26 0 0 1 52.46 21.96L43.8 28.74A15 15 0 0 0 37.15 23.91ZM53.58 23.5A26 26 0 0 1 58 38L47 38A15 15 0 0 0 44.45 29.63ZM6 40h11V56h-11ZM47 40h11V56h-11Z" />
+        <path fill="#D8BE8E" fill-opacity=".16" d="M23.64 8.67A30.5 30.5 0 0 1 40.36 8.67L36.11 23.57A15 15 0 0 0 27.89 23.57Z" />
+      </svg>
+      <div class="nav-dock" id="nav-dock">
+      <nav class="nav" aria-label="Navegación principal" data-mobile-open="false" data-sticky="false" tabindex="-1">
+        <img id="logo-nav" src="public/assets/brand/dovela-logo-horizontal.svg" data-logo-light="public/assets/brand/dovela-logo-horizontal.svg" data-logo-dark="public/assets/brand/dovela-logo-horizontal-dark.svg" width="208" height="64" alt="Dovela Seguros">
+        <button class="nav-more" id="nav-more-toggle" type="button" aria-expanded="false" aria-controls="nav-actions" aria-label="Abrir más opciones">
+          <span>Más</span>
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false"><path d="m8 10 4 4 4-4"/></svg>
+        </button>
+        <div class="nav-actions" id="nav-actions" data-mobile-open="false">
+          <label class="sr-only" for="language-select">Idioma</label>
+          <span class="language-select-wrap">
+            <svg viewBox="0 0 24 24" aria-hidden="true" focusable="false"><circle cx="12" cy="12" r="9"/><path d="M3 12h18M12 3a15 15 0 0 1 0 18M12 3a15 15 0 0 0 0 18"/></svg>
+            <select id="language-select" class="language-select" data-language-select aria-label="Idioma">
+              <option value="es">Español</option>
+              <option value="en">English</option>
+              <option value="fr">Français</option>
+              <option value="pt">Português</option>
+            </select>
+          </span>
+          <span class="nav-theme-option">
+            <span class="nav-action-label">Apariencia</span>
+            <label class="theme-switch">
+              <input class="theme-switch__input" type="checkbox" role="switch" data-theme-toggle aria-label="Cambiar a modo claro">
+              <span class="theme-switch__track" aria-hidden="true">
+                <span class="theme-switch__thumb"></span>
+                <svg class="theme-switch__icon theme-switch__icon--sun" viewBox="0 0 24 24"><circle cx="12" cy="12" r="3.5"/><path d="M12 2v2M12 20v2M4.93 4.93l1.42 1.42M17.65 17.65l1.42 1.42M2 12h2M20 12h2M4.93 19.07l1.42-1.42M17.65 6.35l1.42-1.42"/></svg>
+                <svg class="theme-switch__icon theme-switch__icon--moon" viewBox="0 0 24 24"><path d="M20 15.2A8.3 8.3 0 0 1 8.8 4a8.4 8.4 0 1 0 11.2 11.2Z"/></svg>
+              </span>
+              <span class="sr-only" data-theme-toggle-label>Cambiar a modo claro</span>
+            </label>
+          </span>
+          <button class="nav-help" type="button" data-tour-open aria-label="Cómo funciona" title="Cómo funciona"><svg viewBox="0 0 24 24" aria-hidden="true" focusable="false"><circle cx="12" cy="12" r="9"/><path d="M9.6 9.3a2.5 2.5 0 0 1 4.8.9c0 1.7-2.4 2.2-2.4 3.8"/><path d="M12 17.2h.01"/></svg><span class="nav-action-text">Cómo funciona</span></button>
+          <a href="interno.html" class="btn-portal" aria-label="Acceso interno"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false"><rect x="5" y="11" width="14" height="9" rx="2.2"/><path d="M8.5 11V8a3.5 3.5 0 0 1 7 0v3"/></svg><span class="nav-action-text">Acceso interno</span></a>
+        </div>
+      </nav>
+      </div>
+      <div class="hero">
+        <p class="kicker">Portal de Autogestión · Dovela Seguros <span aria-hidden="true"></span></p>
+        <h1>Lo que más importa, <em>bien sostenido.</em></h1>
+        <p>Presente reclamos, siga su estado y encuentre prestadores con la claridad y el acompañamiento que usted merece.</p>
+        <a class="hero-link" href="#servicios">Explore nuestros servicios <span aria-hidden="true">↗</span></a>
+      </div>
+    </header>
+
+    <button class="back-to-top" id="back-to-top" type="button" aria-label="Volver arriba" aria-hidden="true" tabindex="-1" data-visible="false">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false"><path d="m6 14 6-6 6 6"/><path d="M12 8v10"/></svg>
+      <span>Volver arriba</span>
+    </button>
+
+    
+
+    <section class="banner-car" aria-label="Novedades de Dovela" data-reveal="feature">
+      <div id="banner-slide" class="banner-slide" aria-live="off"></div>
+      <div class="banner-controls">
+        <div class="banner-dots" id="banner-dots" role="group" aria-label="Seleccione una novedad"></div>
+        <button type="button" class="banner-pause" id="banner-pause" aria-label="Pausar novedades" aria-pressed="false">Pausar</button>
+      </div>
+      <p class="sr-only" id="banner-status" role="status" aria-live="polite"></p>
+    </section>
+    <main class="wrap" id="contenido-principal">
+      <section class="services-section" id="servicios" aria-labelledby="servicios-title">
+        <div class="section-heading" data-reveal="heading">
+          <p class="eyebrow">SERVICIOS EN LÍNEA</p>
+          <h2 id="servicios-title">Estamos aquí para ayudarle</h2>
+          <p>Acceda directamente a las gestiones y recursos que necesita.</p>
+        </div>
+      <div class="cards-acceso" data-reveal="cards">
+        <button type="button" class="card-acc" onclick="abrirWizard()">
+          <span class="featured-glow" aria-hidden="true"><span class="featured-glow__dots"></span></span>
+          <span class="icono" aria-hidden="true"><svg viewBox="0 0 32 32" fill="none"><path d="M16 28s10-4.7 10-12V6l-10-3-10 3v10c0 7.3 10 12 10 12Z"/><path d="M11 16h10M16 11v10"/></svg></span>
+          <span class="card-kicker">GESTIÓN DE RECLAMOS</span>
+          <span class="card-title">Presentar un reclamo</span>
+          <span class="card-desc">Salud individual, colectivo salud, vida y accidentes personales. Formulario guiado según quién presenta.</span>
+          <span class="ir">Iniciar solicitud <span aria-hidden="true">↗</span></span>
+        </button>
+        <button type="button" class="card-acc card-acc--network" onclick="ir('v-red')">
+          <span class="icono" aria-hidden="true"><svg viewBox="0 0 32 32" fill="none"><circle cx="16" cy="16" r="4"/><circle cx="6" cy="8" r="2"/><circle cx="26" cy="8" r="2"/><circle cx="7" cy="26" r="2"/><circle cx="25" cy="26" r="2"/><path d="m8 9 5 4m11-4-5 4M8 25l5-6m11 6-5-6"/></svg></span>
+          <span class="card-kicker">ATENCIÓN MÉDICA</span>
+          <span class="card-title">Red Médica Dovela</span>
+          <span class="card-desc">Consulte hospitales, clínicas y médicos del directorio de prestadores. Filtre por especialidad, provincia o nombre.</span>
+          <span class="ir">Explorar red <span aria-hidden="true">↗</span></span>
+        </button>
+        <button type="button" class="card-acc" id="card-seguimiento" onclick="abrirConsultaReclamo()">
+          <span class="icono" aria-hidden="true"><svg viewBox="0 0 32 32" fill="none"><path d="M18 4H8a3 3 0 0 0-3 3v18a3 3 0 0 0 3 3h11"/><path d="M11 11h10M11 16h7"/><circle cx="22" cy="22" r="5"/><path d="m26 26 3 3"/></svg></span>
+          <span class="card-kicker">SEGUIMIENTO DE RECLAMOS</span>
+          <span class="card-title">Consultar estado de reclamo</span>
+          <span class="card-desc">Consulte el progreso de su solicitud con el código de seguimiento recibido al presentar el reclamo.</span>
+          <span class="ir">Consultar estado <span aria-hidden="true">↗</span></span>
+        </button>
+        <article class="qr-guide" id="guia-qr" aria-labelledby="guia-qr-title" data-paused="false">
+          <div class="qr-guide__stage" aria-hidden="true">
+            <svg width="0" height="0" class="qr-guide__defs" focusable="false"><symbol id="qr-guide-glyph" viewBox="0 0 21 21"><path fill="currentColor" fill-rule="evenodd" d="M0 0h7v7h-7zM1 1v5h5v-5zM2 2h3v3h-3zM14 0h7v7h-7zM15 1v5h5v-5zM16 2h3v3h-3zM0 14h7v7h-7zM1 15v5h5v-5zM2 16h3v3h-3zM8 0h1v1h-1zM10 0h2v1h-2zM9 1h1v1h-1zM12 1h1v1h-1zM8 2h2v1h-2zM11 2h1v1h-1zM10 3h2v1h-2zM8 4h1v1h-1zM12 4h1v1h-1zM9 5h2v1h-2zM8 6h1v1h-1zM10 6h1v1h-1zM12 6h1v1h-1zM0 8h2v1h-2zM3 8h1v1h-1zM6 8h1v1h-1zM8 8h3v1h-3zM13 8h1v1h-1zM16 8h2v1h-2zM19 8h2v1h-2zM1 9h1v1h-1zM4 9h2v1h-2zM9 9h1v1h-1zM11 9h2v1h-2zM15 9h1v1h-1zM18 9h1v1h-1zM0 10h1v1h-1zM2 10h2v1h-2zM6 10h1v1h-1zM8 10h1v1h-1zM10 10h1v1h-1zM13 10h3v1h-3zM17 10h2v1h-2zM20 10h1v1h-1zM3 11h1v1h-1zM5 11h1v1h-1zM9 11h2v1h-2zM12 11h1v1h-1zM16 11h1v1h-1zM19 11h1v1h-1zM0 12h2v1h-2zM4 12h1v1h-1zM6 12h1v1h-1zM8 12h1v1h-1zM11 12h3v1h-3zM15 12h2v1h-2zM18 12h2v1h-2zM8 13h2v1h-2zM12 13h1v1h-1zM14 13h1v1h-1zM17 13h1v1h-1zM20 13h1v1h-1zM8 14h1v1h-1zM10 14h2v1h-2zM14 14h3v1h-3zM19 14h1v1h-1zM9 15h1v1h-1zM12 15h1v1h-1zM16 15h2v1h-2zM20 15h1v1h-1zM8 16h2v1h-2zM11 16h1v1h-1zM14 16h1v1h-1zM18 16h2v1h-2zM10 17h1v1h-1zM13 17h2v1h-2zM17 17h1v1h-1zM20 17h1v1h-1zM8 18h1v1h-1zM11 18h2v1h-2zM15 18h1v1h-1zM18 18h1v1h-1zM9 19h2v1h-2zM13 19h1v1h-1zM16 19h2v1h-2zM20 19h1v1h-1zM8 20h1v1h-1zM11 20h1v1h-1zM14 20h2v1h-2zM19 20h2v1h-2z"/></symbol></svg>
+            <div class="qr-guide__receipt">
+              <span class="qr-guide__receipt-head"></span>
+              <span class="qr-guide__receipt-line"></span>
+              <span class="qr-guide__receipt-line qr-guide__receipt-line--short"></span>
+              <span class="qr-guide__receipt-line"></span>
+              <span class="qr-guide__receipt-line qr-guide__receipt-line--short"></span>
+              <svg class="qr-guide__receipt-qr" focusable="false"><use href="#qr-guide-glyph"/></svg>
+            </div>
+            <div class="qr-guide__phone">
+              <span class="qr-guide__notch"></span>
+              <div class="qr-guide__screen">
+                <div class="qr-guide__camera">
+                  <svg class="qr-guide__camera-qr" focusable="false"><use href="#qr-guide-glyph"/></svg>
+                  <span class="qr-guide__frame"></span>
+                  <span class="qr-guide__scanline"></span>
+                </div>
+                <div class="qr-guide__page">
+                  <span class="qr-guide__page-bar"></span>
+                  <span class="qr-guide__page-title"></span>
+                  <span class="qr-guide__page-field qr-guide__page-field--filled"></span>
+                  <span class="qr-guide__page-field"></span>
+                  <span class="qr-guide__page-button"></span>
+                </div>
+              </div>
+              <span class="qr-guide__tap"></span>
+            </div>
+          </div>
+          <div class="qr-guide__copy">
+            <span class="card-kicker">GUÍA RÁPIDA · CÓDIGO QR</span>
+            <h3 class="card-title" id="guia-qr-title">Siga su reclamo desde el celular</h3>
+            <p class="qr-guide__intro">Su comprobante de reclamo en PDF incluye un código QR que abre directamente la consulta de estado.</p>
+            <ol class="qr-guide__steps" role="list">
+              <li class="qr-guide__step qr-guide__step--1"><b>Abra la cámara</b> <span>Use la cámara de su celular o una aplicación lectora de códigos QR.</span></li>
+              <li class="qr-guide__step qr-guide__step--2"><b>Apunte al código QR</b> <span>Lo encontrará junto a los datos de su comprobante, impreso o en pantalla.</span></li>
+              <li class="qr-guide__step qr-guide__step--3"><b>Toque el enlace</b> <span>Su código de reclamo se carga solo; confirme con la cédula o pasaporte del asegurado.</span></li>
+            </ol>
+            <button type="button" class="qr-guide__pause" id="guia-qr-pause" aria-label="Pausar animación de la guía" aria-pressed="false">Pausar</button>
+          </div>
+        </article>
+      </div>
+      </section>
+
+      <aside class="emergencia" aria-labelledby="emergencia-title" data-reveal="feature">
+        <span class="icono" aria-hidden="true"><svg viewBox="0 0 32 32" fill="none"><path d="M16 28s10-4.7 10-12V6l-10-3-10 3v10c0 7.3 10 12 10 12Z"/><path d="M16 10v11m-5-5.5h10"/></svg></span>
+        <div class="emergencia-copy">
+          <p class="eyebrow">ASISTENCIA INMEDIATA</p>
+          <h2 id="emergencia-title">Coordinación y emergencias médicas</h2>
+          <p>Si necesita atención médica inmediata, acuda al servicio de urgencias más cercano y comuníquese con la
+            <b>Línea de Asistencia Dovela</b> indicada en su carné de asegurado. Le orientaremos sobre los siguientes pasos.</p>
+        </div>
+      </aside>
+
+      <section class="seccion" id="sec-formularios" aria-labelledby="formularios-title">
+        <div class="section-heading" data-reveal="heading">
+        <p class="eyebrow">RECURSOS ÚTILES</p>
+        <h2 id="formularios-title">Formularios</h2>
+        <p class="sub">Descargue, complete y firme el formulario que necesite; luego cárguelo junto con sus documentos
+          en el paso correspondiente.</p></div>
+        <div class="forms-grid" data-reveal="cards">
+          <div class="form-card">
+            <span class="form-icon" aria-hidden="true">01 / PDF</span>
+            <h3>Formulario de Reclamos de Gastos Médicos</h3>
+            <p>Requerido para reclamos de salud y accidentes personales. Incluye las secciones del asegurado y del
+              médico proveedor, y la guía de presentación.</p>
+            <div class="acciones">
+              <button class="btn btn-azul btn-sm" onclick="descargarPDF('reclamos')">Descargar <span aria-hidden="true">↓</span></button>
+              <button class="btn btn-ghost btn-sm" onclick="abrirPDF('reclamos')">Ver en línea <span aria-hidden="true">↗</span></button>
+            </div>
+          </div>
+          <div class="form-card">
+            <span class="form-icon" aria-hidden="true">02 / PDF</span>
+            <h3>Formulario de Pre-Autorización de Beneficios</h3>
+            <p>Para hospitalización, cirugías electivas, procedimientos y estudios especializados. Debe someterse al
+              menos 3 días antes de la fecha sugerida para cirugías electivas.</p>
+            <div class="acciones">
+              <button class="btn btn-azul btn-sm" onclick="descargarPDF('preauth')">Descargar <span aria-hidden="true">↓</span></button>
+              <button class="btn btn-ghost btn-sm" onclick="abrirPDF('preauth')">Ver en línea <span aria-hidden="true">↗</span></button>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <section class="seccion seccion--steps" aria-labelledby="pasos-title">
+        <div class="section-heading" data-reveal="heading">
+        <p class="eyebrow">UN PROCESO CLARO</p>
+        <h2 id="pasos-title">Cómo funciona</h2>
+        <p class="sub">Tres pasos, un solo canal, trazabilidad completa.</p></div>
+        <div class="pasos" data-reveal="cards">
+          <div class="paso">
+            <div class="num">PASO 01</div>
+            <h3>Complete el formulario</h3>
+            <p>Indique quién presenta y el producto. El sistema le muestra exactamente los requisitos que le aplican.
+            </p>
+          </div>
+          <div class="paso">
+            <div class="num">PASO 02</div>
+            <h3>Cargue sus documentos</h3>
+            <p>Suba archivos o tome fotos desde su celular siguiendo la guía. Validamos formato y tamaño antes del
+              envío.</p>
+          </div>
+          <div class="paso">
+            <div class="num">PASO 03</div>
+            <h3>Reciba su radicado</h3>
+            <p>Obtenga al instante un número único que lo acompaña durante todo el proceso.</p>
+          </div>
+        </div>
+      </section>
+    </main>
+
+    <footer class="footer-pub">
+      <div class="wrap footer-grid">
+        <div class="footer-brand">
+          <img id="logo-footer" src="public/assets/brand/dovela-logo-horizontal-dark.svg" width="208" height="64" alt="Dovela Seguros">
+          <p>Protección que se construye pieza a pieza: acompañamos a cada persona con procesos claros, trato cercano y decisiones explicadas.</p>
+        </div>
+        <dl class="footer-principles">
+          <div><dt>Misión</dt><dd>Sostener la tranquilidad de las personas con un servicio de seguros claro, oportuno y humano en cada momento que importa.</dd></div>
+          <div><dt>Visión</dt><dd>Ser la aseguradora de referencia por la confianza que genera, la transparencia de sus procesos y la calidez de su servicio.</dd></div>
+        </dl>
+        <p class="footer-note"><strong>Dovela Seguros · Operaciones y Reclamos.</strong> Entidad ficticia con fines demostrativos: no es una aseguradora autorizada, no emite pólizas ni ofrece coberturas reales.</p>
+      </div>
+    </footer>
+  </div>
+
+  <dialog class="language-dialog" id="i18n-language-dialog" aria-labelledby="i18n-dialog-title" aria-describedby="i18n-dialog-description i18n-location-note">
+    <div class="dialog-head">
+      <div class="language-dialog__icon" aria-hidden="true">
+        <svg viewBox="0 0 24 24" focusable="false"><circle cx="12" cy="12" r="9"/><path d="M3 12h18M12 3a15 15 0 0 1 0 18M12 3a15 15 0 0 0 0 18"/></svg>
+      </div>
+      <label class="theme-switch">
+        <input class="theme-switch__input" type="checkbox" role="switch" data-theme-toggle aria-label="Cambiar a modo claro">
+        <span class="theme-switch__track" aria-hidden="true">
+          <span class="theme-switch__thumb"></span>
+          <svg class="theme-switch__icon theme-switch__icon--sun" viewBox="0 0 24 24"><circle cx="12" cy="12" r="3.5"/><path d="M12 2v2M12 20v2M4.93 4.93l1.42 1.42M17.65 17.65l1.42 1.42M2 12h2M20 12h2M4.93 19.07l1.42-1.42M17.65 6.35l1.42-1.42"/></svg>
+          <svg class="theme-switch__icon theme-switch__icon--moon" viewBox="0 0 24 24"><path d="M20 15.2A8.3 8.3 0 0 1 8.8 4a8.4 8.4 0 1 0 11.2 11.2Z"/></svg>
+        </span>
+        <span class="sr-only" data-theme-toggle-label>Cambiar a modo claro</span>
+      </label>
+    </div>
+    <div class="language-dialog__intro">
+      <p class="language-dialog__eyebrow">Preferencias de idioma</p>
+      <h2 id="i18n-dialog-title">Su idioma, a su manera</h2>
+      <p id="i18n-dialog-description">Su navegador parece estar configurado en <strong id="i18n-recommended-language">English</strong>. ¿Desea usar este idioma en Dovela?</p>
+      <p class="language-dialog__default">El portal permanece en español hasta que usted confirme el cambio.</p>
+    </div>
+    <div class="language-dialog__choices">
+      <div class="language-dialog__actions">
+        <button class="btn btn-azul" id="i18n-switch" type="button" data-locale="en">Cambiar idioma: English</button>
+        <button class="btn btn-ghost" id="i18n-stay-spanish" type="button">Mantener español</button>
+      </div>
+      <div class="language-dialog__others">
+        <p class="language-dialog__others-label" id="i18n-others-label">O elija otro idioma:</p>
+        <div class="language-dialog__chips" role="group" aria-labelledby="i18n-others-label">
+          <button class="language-chip" type="button" data-locale="en" lang="en" data-i18n-ignore>English</button>
+          <button class="language-chip" type="button" data-locale="fr" lang="fr" data-i18n-ignore>Français</button>
+          <button class="language-chip" type="button" data-locale="pt" lang="pt" data-i18n-ignore>Português</button>
+        </div>
+      </div>
+      <button class="language-dialog__location" id="i18n-use-location" type="button" hidden>
+        <svg viewBox="0 0 24 24" aria-hidden="true" focusable="false"><path d="M12 21s6-5.3 6-11a6 6 0 1 0-12 0c0 5.7 6 11 6 11Z"/><circle cx="12" cy="10" r="2"/></svg>
+        <span>Usar mi ubicación para recomendar un idioma</span>
+      </button>
+      <p class="language-dialog__note" id="i18n-location-note">La ubicación es opcional. Solo se usa en este dispositivo para recomendar un idioma; no se guarda ni se envía.</p>
+      <p class="language-dialog__status" id="i18n-location-status" role="status" aria-live="polite"></p>
+    </div>
+  </dialog>
+  <p class="sr-only" id="i18n-announcer" role="status" aria-live="polite"></p>
+
+  <!-- TUTORIAL DE INGRESO: lo crea public/js/tour.js desde public-app.js -->
+
+  <!-- WIZARD DE RECLAMO -->
+  <div class="view" id="v-wizard">
+    <button class="volver" onclick="reiniciarWizard();ir('v-landing')">← Volver al inicio</button>
+    <div class="panel">
+      <h2>Presentar un reclamo</h2>
+      <p class="ayuda" id="w-intro">Tiempo estimado: 3–5 minutos.</p>
+      <div class="stepper" id="stepper">
+        <div class="st">Perfil</div>
+        <div class="st">Producto</div>
+        <div class="st">Asegurado</div>
+        <div class="st">Evento</div>
+        <div class="st">Documentos</div>
+        <div class="st">Confirmar</div>
+      </div>
+
+      <!-- Paso 1: quién presenta -->
+      <div class="wstep" data-paso="0">
+        <p class="req wizard-choice-label" id="perfil-group-label">¿Quién presenta el reclamo?</p>
+        <div class="tipos-reclamo" id="perfiles" role="radiogroup" aria-labelledby="perfil-group-label" aria-describedby="err-perfil" aria-invalid="false"></div>
+        <p class="error-msg" id="err-perfil" style="display:none">Seleccione quién presenta el reclamo para continuar.
+        </p>
+      </div>
+
+      <!-- Paso 2: producto -->
+      <div class="wstep hidden" data-paso="1">
+
+        <p class="req wizard-choice-label" id="tipo-group-label">Seleccione la línea del reclamo</p>
+
+        <div class="tipos-reclamo" id="tipos" role="radiogroup" aria-labelledby="tipo-group-label" aria-describedby="err-tipo" aria-invalid="false"></div>
+
+        <p class="error-msg" id="err-tipo" style="display:none">
+          Seleccione la línea del reclamo.
+        </p>
+
+        <div class="campo" id="campo-producto" style="margin-top:18px">
+
+          <label class="req">Producto de la póliza</label>
+
+          <select id="f-producto">
+            <option value="">Seleccione la línea primero…</option>
+          </select>
+
+          <p class="ayuda">
+            Aparece en su póliza o certificado. Si no lo conoce,
+            elija "No estoy seguro" y el especialista lo validará.
+          </p>
+
+          <p class="error-msg">
+            Seleccione el producto.
+          </p>
+
+        </div>
+        <!-- Tipos de servicio -->
+        <div style="margin-top:24px">
+
+          <h3 id="servicio-group-label">Tipo de servicio</h3>
+          <p class="muted">
+            Seleccione el servicio relacionado con su reclamo.
+          </p>
+          <div class="servicios-grid" role="radiogroup" aria-labelledby="servicio-group-label" aria-describedby="err-servicio" aria-invalid="false">
+            <label class="servicio-card">
+              <input class="wizard-choice__control" type="radio" name="servicio" value="M" onchange="selServicio(this.value)" aria-describedby="err-servicio">
+
+              <div class="icono"><span class="ico" data-icon="estetoscopio" aria-hidden="true"></span></div>
+              <h4>Servicio Médico</h4>
+              <p>
+                Consultas, hospitalización,
+                cirugías y procedimientos médicos.
+              </p>
+            </label>
+            <label class="servicio-card">
+              <input class="wizard-choice__control" type="radio" name="servicio" value="D" onchange="selServicio(this.value)" aria-describedby="err-servicio">
+
+              <div class="icono"><span class="ico" data-icon="diente" aria-hidden="true"></span></div>
+              <h4>Servicio Dental</h4>
+              <p>
+                Odontología, ortodoncia,
+                implantes y tratamientos.
+              </p>
+            </label>
+
+            <label class="servicio-card">
+              <input class="wizard-choice__control" type="radio" name="servicio" value="V" onchange="selServicio(this.value)" aria-describedby="err-servicio">
+              <div class="icono"><span class="ico" data-icon="lentes" aria-hidden="true"></span></div>
+              <h4>Servicio Óptico</h4>
+              <p>
+                Exámenes visuales,
+                lentes y monturas.
+              </p>
+            </label>
+          </div>
+          <p class="error-msg" id="err-servicio" style="display:none">
+            Seleccione el tipo de servicio.
+          </p>
+        </div>
+      </div>
+
+      <!-- Paso 3: asegurado -->
+      <div class="wstep hidden" data-paso="2">
+        <div class="aviso-inline" id="aviso-perfil"></div>
+        <div class="grid2">
+          <div class="campo"><label class="req">Nombre completo del asegurado</label><input id="f-nombre"
+              placeholder="Ej. María Elena Castillo">
+            <p class="error-msg">Escriba el nombre del asegurado.</p>
+          </div>
+          <div class="campo"><label class="req">Cédula o pasaporte del asegurado</label><input id="f-cedula"
+              placeholder="8-888-8888">
+            <p class="error-msg">Escriba la cédula o pasaporte.</p>
+          </div>
+          <div class="campo"><label>Número de póliza / certificado</label><input id="f-poliza"
+              placeholder="Si lo conoce"></div>
+          <div class="campo"><label class="req">Teléfono de contacto</label><input id="f-tel" placeholder="6000-0000">
+            <p class="error-msg">Escriba un teléfono de contacto.</p>
+          </div>
+          <div class="campo"><label class="req" id="lbl-email">Correo electrónico</label><input id="f-email"
+              type="email" placeholder="nombre@correo.com">
+            <p class="error-msg">Escriba un correo válido.</p>
+          </div>
+          <div class="campo hidden" id="campo-hospital"><label class="req">Hospital / clínica que presenta</label><input
+              id="f-hospital" placeholder="Ej. Hospital General de Valdoria">
+            <p class="error-msg">Indique el hospital o clínica.</p>
+          </div>
+          <div class="campo hidden" id="campo-corredora"><label>Corredora de seguros</label><input id="f-corredora"
+              placeholder="Nombre de la corredora"></div>
+        </div>
+      </div>
+
+      <!-- Paso 4: evento -->
+      <div class="wstep hidden" data-paso="3">
+        <div class="grid2">
+          <div class="campo"><label class="req">Fecha de atención (primera fecha, incluye facturas)</label><input
+              id="f-fecha" type="date" onchange="SC.validarFechaEvento()">
+            <p class="ayuda" style="margin-top:6px">Solo se aceptan atenciones dentro de los últimos 365 días. No hay
+              cobertura para facturas con fecha mayor a un año desde la radicación.</p>
+            <p class="error-msg" id="err-fecha">Indique una fecha válida dentro de los últimos 365 días.</p>
+          </div>
+          <div class="campo" id="campo-monto">
+            <label id="lbl-monto" class="req">Monto facturado (USD)</label>
+            <input id="f-monto" type="number" min="0" step="0.01" placeholder="0.00">
+            <label id="chk-monto-wrap" class="hidden"
+              style="display:flex;gap:8px;align-items:center;font-weight:500;font-size:13px;margin-top:8px">
+              <input type="checkbox" id="f-sinmonto" style="width:auto" onchange="toggleMonto()"> No conozco el monto
+              exacto
+            </label>
+            <p class="ayuda" id="ayuda-monto"></p>
+            <p class="error-msg" id="err-monto">Indique el monto.</p>
+          </div>
+        </div>
+        <div class="campo" id="campo-proveedor"><label>Proveedor médico / hospital donde se atendió</label><input
+            id="f-proveedor" placeholder="Ej. Hospital General de Valdoria">
+          <p class="ayuda">Este campo aplica solo cuando presenta un hospital, clínica o proveedor.</p>
+        </div>
+        <div class="campo"><label class="req">Descripción del evento</label><textarea id="f-desc" rows="4"
+            placeholder="Cuéntenos brevemente qué ocurrió: diagnóstico, atención recibida o circunstancias del evento."></textarea>
+          <p class="error-msg">Describa brevemente el evento.</p>
+        </div>
+      </div>
+
+      <!-- Paso 5: documentos -->
+      <div class="wstep hidden" data-paso="4">
+        <div class="tips-foto"><span class="ico" data-icon="camara" aria-hidden="true"></span> <b>Guía para fotos legibles:</b> use buena luz, capture el documento completo sin
+          dedos ni sombras, y verifique que los montos y nombres se lean con claridad. Puede cargar archivos <b>PDF, JPG
+            o PNG</b> o tomar la foto directamente con la cámara. En facturas y resultados puede adjuntar <b>varios
+            archivos</b>.</div>
+        <div class="aviso-inline">¿Necesita el formulario? <button class="btn-link"
+            onclick="descargarPDF('reclamos')">Descargue aquí el Formulario de Reclamos de Gastos Médicos</button>,
+          complételo, fírmelo y cárguelo abajo.</div>
+        <div class="doclist" id="doclist"></div>
+        <p class="error-msg" id="err-docs" style="display:none">Cargue todos los documentos marcados como obligatorios.
+        </p>
+      </div>
+
+      <!-- Paso 6: confirmación -->
+      <div class="wstep hidden" data-paso="5">
+        <h3 style="font-family:var(--serif);color:var(--text-primary);margin-bottom:12px">Revise antes de enviar</h3>
+        <dl class="resumen" id="resumen"></dl>
+        <div class="campo" style="margin-top:16px">
+          <label style="display:flex;gap:10px;align-items:flex-start;font-weight:500;font-size:13.5px">
+            <input type="checkbox" id="f-consent" style="width:auto;margin-top:2px">
+            <span>Declaro que la información es veraz y otorgo consentimiento expreso a Dovela Seguros para el
+              tratamiento de mis datos personales, incluidos datos de salud, conforme a la normativa de protección de
+              datos aplicable y únicamente para la gestión de esta solicitud.</span>
+          </label>
+          <p class="error-msg" id="err-consent">Debe aceptar la declaración para enviar.</p>
+        </div>
+      </div>
+
+      <!-- Éxito -->
+      <div class="wstep hidden" data-paso="6">
+        <div class="radicado-box">
+          <div class="check-grande"><span class="ico" data-icon="check" aria-hidden="true"></span></div>
+          <h3 style="font-family:var(--serif);color:var(--text-primary);margin-top:18px">¡Reclamo recibido!</h3>
+          <div class="num" id="radicado-num"></div>
+
+          <div id="ticket-reclamo" class="ticket hidden">
+            <div class="ticket-header">
+              <img id="logo-ticket" src="public/assets/brand/dovela-logo-horizontal-dark.svg" data-logo-light="public/assets/brand/dovela-logo-horizontal.svg" data-logo-dark="public/assets/brand/dovela-logo-horizontal-dark.svg" width="208" height="64" alt="Dovela Seguros" class="ticket-logo">
+
+              <h2>Comprobante de Recepción</h2>
+            </div>
+
+            <hr>
+
+            <div class="ticket-item">
+              <span>Código</span>
+              <strong id="t-codigo"></strong>
+            </div>
+
+            <div class="ticket-item">
+              <span>Presentado por</span>
+              <strong id="t-perfil"></strong>
+            </div>
+
+            <div class="ticket-item">
+              <span>Línea</span>
+              <strong id="t-linea"></strong>
+            </div>
+
+            <div class="ticket-item">
+              <span>Producto</span>
+              <strong id="t-producto"></strong>
+            </div>
+
+            <div class="ticket-item">
+              <span>Servicio</span>
+              <strong id="t-servicio"></strong>
+            </div>
+
+            <div class="ticket-item">
+              <span>Fecha del evento</span>
+              <strong id="t-fecha-evento"></strong>
+            </div>
+
+            <div class="ticket-item">
+              <span>Recibido</span>
+              <strong id="t-fecha-recepcion"></strong>
+            </div>
+            <hr>
+            <p class="ticket-nota">
+              Este comprobante confirma únicamente la recepción
+              del reclamo.
+              No representa aprobación de cobertura.
+              Conserve este documento.
+            </p>
+          </div>
+          <p style="max-width:440px;margin:0 auto;font-size:14px;color:var(--pizarra)">Guarde este número. Le enviamos
+            un acuse al correo registrado. Puede consultar el avance en cualquier momento con su radicado y su cédula o
+            correo.</p>
+          <div style="margin-top:22px;display:flex;gap:10px;justify-content:center;flex-wrap:wrap">
+            <!-- <button class="btn btn-azul" onclick="ir('v-track')">Seguir mi reclamo</button> -->
+            <button class="btn btn-ghost" onclick="reiniciarWizard();ir('v-landing')">Volver al inicio</button>
+            <button class="btn btn-verde" id="btn-pdf" type="button" data-download-action="receipt" aria-describedby="pdf-download-status">
+
+              <span class="ico" data-icon="documento" aria-hidden="true"></span> Descargar comprobante PDF
+
+            </button>
+            <p class="sr-only" id="pdf-download-status" role="status" aria-live="polite"></p>
+          </div>
+        </div>
+      </div>
+
+      <div class="nav-wizard" id="nav-wizard">
+        <button class="btn btn-ghost" id="btn-atras" onclick="pasoWizard(-1)">← Atrás</button>
+        <button class="btn btn-azul" id="btn-sig" onclick="pasoWizard(1)">Continuar →</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- PRE-AUTORIZACIÓN -->
+  <div class="view" id="v-preauth">
+    <button class="volver" onclick="ir('v-landing')">← Volver al inicio</button>
+    <div class="panel">
+      <h2>Solicitud de pre-autorización médica</h2>
+      <p class="ayuda" style="margin-bottom:6px">Para hospitalización, cirugías electivas, procedimientos y estudios
+        especializados.</p>
+      <div class="tips-foto" style="margin-top:14px"><span class="ico" data-icon="reloj" aria-hidden="true"></span> <b>Importante:</b> para cirugías electivas, someta esta
+        solicitud <b>al menos 3 días antes</b> de la fecha sugerida. La pre-autorización es válida por <b>30 días</b>.
+        En casos urgentes, envíe esta solicitud de inmediato desde el portal.</div>
+
+      <div id="pa-form">
+        <h3 style="font-family:var(--serif);color:var(--text-primary);margin:8px 0 14px;font-size:17px">Datos de la
+          solicitud</h3>
+        <div class="grid2">
+          <div class="campo"><label class="req">Nombre del asegurado titular</label><input id="pa-asegurado">
+            <p class="error-msg">Indique el asegurado titular.</p>
+          </div>
+          <div class="campo"><label class="req">Cédula o pasaporte del asegurado</label><input id="pa-cedula">
+            <p class="error-msg">Indique la cédula.</p>
+          </div>
+          <div class="campo"><label class="req">Nombre del paciente</label><input id="pa-paciente">
+            <p class="error-msg">Indique el paciente.</p>
+          </div>
+          <div class="campo"><label>Parentesco con el asegurado</label><select id="pa-parentesco">
+              <option>Titular</option>
+              <option>Cónyuge</option>
+              <option>Hijo(a)</option>
+              <option>Otro</option>
+            </select></div>
+          <div class="campo"><label>Número de póliza</label><input id="pa-poliza" placeholder="Si lo conoce"></div>
+          <div class="campo"><label class="req">Correo para la confirmación</label><input id="pa-email" type="email">
+            <p class="error-msg">Correo válido requerido.</p>
+          </div>
+          <div class="campo"><label class="req">Teléfono de contacto</label><input id="pa-tel">
+            <p class="error-msg">Teléfono requerido.</p>
+          </div>
+          <div class="campo"><label class="req">Tipo de solicitud</label>
+            <select id="pa-tipo">
+              <option value="">Seleccione…</option>
+              <option>Hospitalización</option>
+              <option>Cirugía ambulatoria</option>
+              <option>Examen y/o procedimiento especial ambulatorio</option>
+              <option>Rayos X y laboratorios</option>
+            </select>
+            <p class="error-msg">Seleccione el tipo.</p>
+          </div>
+          <div class="campo"><label class="req">Médico tratante</label><input id="pa-medico">
+            <p class="error-msg">Indique el médico tratante.</p>
+          </div>
+          <div class="campo"><label>Hospital / centro donde se realizará</label><input id="pa-hospital"></div>
+          <div class="campo"><label>Fecha sugerida de ingreso o del procedimiento</label><input id="pa-fecha"
+              type="date"></div>
+          <div class="campo"><label style="display:flex;gap:8px;align-items:center;margin-top:26px"><input
+                type="checkbox" id="pa-urgente" style="width:auto"> Marcar como <b>URGENTE</b></label></div>
+        </div>
+        <div class="campo"><label class="req">Diagnóstico y procedimientos requeridos</label><textarea id="pa-desc"
+            rows="4"
+            placeholder="Describa el cuadro clínico, diagnóstico y los procedimientos solicitados (según el informe del médico tratante)."></textarea>
+          <p class="error-msg">Describa el diagnóstico y los procedimientos.</p>
+        </div>
+
+        <h3 style="font-family:var(--serif);color:var(--text-primary);margin:16px 0 12px;font-size:17px">Documentos
+          requeridos</h3>
+        <div class="aviso-inline">¿Aún no tiene el formulario? <button class="btn-link"
+            onclick="descargarPDF('preauth')">Descargue aquí el Formulario de Pre-Autorización de Beneficios
+            Dovela</button>, complételo con su médico y cárguelo abajo.</div>
+        <div class="doclist" id="pa-docs"></div>
+        <div class="campo" style="margin-top:16px">
+          <label style="display:flex;gap:10px;align-items:flex-start;font-weight:500;font-size:13.5px">
+            <input type="checkbox" id="pa-consent" style="width:auto;margin-top:2px">
+            <span>Autorizo a Dovela Seguros a tratar mis datos personales y de salud para la evaluación de esta
+              pre-autorización, conforme a la normativa vigente.</span>
+          </label>
+        </div>
+        <div style="margin-top:20px;display:flex;justify-content:flex-end">
+          <button class="btn btn-verde" onclick="enviarPreauth()">Enviar solicitud →</button>
+        </div>
+      </div>
+
+      <div id="pa-ok" class="hidden radicado-box">
+        <div class="check-grande"><span class="ico" data-icon="check" aria-hidden="true"></span></div>
+        <h3 style="font-family:var(--serif);color:var(--text-primary);margin-top:18px">Solicitud de pre-autorización
+          recibida</h3>
+        <div class="num" id="pa-num"></div>
+        <p style="max-width:460px;margin:0 auto;font-size:14px;color:var(--pizarra)">Nuestros médicos asesores evaluarán
+          su solicitud. Recibirá la confirmación al correo indicado. Recuerde: antes de referir al paciente al hospital
+          o realizar el estudio, debe tener la autorización escrita de Dovela Seguros.</p>
+        <div style="margin-top:22px;display:flex;gap:10px;justify-content:center;flex-wrap:wrap">
+          <button class="btn btn-azul" onclick="ir('v-track')">Seguir mi solicitud</button>
+          <button class="btn btn-ghost" onclick="ir('v-landing')">Volver al inicio</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- CONSULTA DE RECLAMOS -->
+  <div class="view" id="v-claim-status">
+    <main class="claim-status-shell">
+      <button type="button" class="volver" onclick="volverDeConsultaReclamo()">← Volver al inicio</button>
+      <section class="panel claim-status-panel" aria-labelledby="cs-title">
+        <p class="claim-status-kicker">SEGUIMIENTO DE RECLAMOS</p>
+        <h1 id="cs-title" tabindex="-1">Consultar estado de reclamo</h1>
+        <p class="claim-status-intro">Introduzca su código de seguimiento y la cédula o pasaporte del asegurado registrado al presentar el reclamo para consultar su estado.</p>
+        <form id="cs-form" onsubmit="consultarEstadoReclamo(event)" novalidate>
+          <div class="campo">
+            <label for="cs-code">Código de reclamo</label>
+            <input id="cs-code" name="codigo" type="text" autocomplete="off" autocapitalize="characters" spellcheck="false" inputmode="text" maxlength="32" placeholder="Ej. SGP-26294-0001-M" aria-describedby="cs-code-help cs-code-error" required>
+            <p class="ayuda" id="cs-code-help">Encuéntrelo en su comprobante de recepcion de reclamo</p>
+            <p class="error-msg" id="cs-code-error" role="alert" hidden></p>
+          </div>
+          <div class="campo">
+            <label for="cs-cedula">Cédula o pasaporte del asegurado</label>
+            <input id="cs-cedula" name="cedula" type="text" autocomplete="off" spellcheck="false" inputmode="text" maxlength="32" placeholder="Ej. 8-888-8888" aria-describedby="cs-cedula-help cs-cedula-error" required>
+            <p class="ayuda" id="cs-cedula-help">Es una comprobación adicional para proteger su consulta.</p>
+            <p class="error-msg" id="cs-cedula-error" role="alert" hidden></p>
+          </div>
+          <div class="claim-status-actions">
+            <button class="btn btn-azul" id="cs-submit" type="submit">Consultar estado</button>
+            <button class="btn btn-ghost" type="button" onclick="volverDeConsultaReclamo()">Volver</button>
+          </div>
+        </form>
+        <p class="claim-status-feedback" id="cs-feedback" role="status" aria-live="polite" hidden></p>
+        <section class="claim-status-result" id="cs-result" aria-labelledby="cs-result-title" tabindex="-1" hidden>
+          <p class="claim-status-kicker">CONSULTA DE SU SOLICITUD</p>
+          <h2 id="cs-result-title">Estado de su reclamo</h2>
+          <p class="claim-status-code">Código: <strong id="cs-result-code"></strong></p>
+          <p class="claim-status-state"><span class="badge" id="cs-result-state"></span></p>
+          <p id="cs-result-description"></p>
+          <div class="claim-status-comment" id="cs-result-comment" hidden>
+            <p class="claim-status-comment-label">Mensaje de Dovela</p>
+            <p id="cs-result-comment-text" data-i18n-ignore></p>
+          </div>
+          <p class="claim-status-date" id="cs-result-date" hidden></p>
+          <div class="claim-status-actions">
+            <button class="btn btn-azul" type="button" onclick="consultarNuevamente()">Consultar nuevamente</button>
+            <button class="btn btn-ghost" type="button" onclick="volverDeConsultaReclamo()">Volver al inicio</button>
+          </div>
+        </section>
+      </section>
+    </main>
+  </div>
+
+  <!-- TRACKING -->
+  <div class="view" id="v-track">
+    <button class="volver" onclick="ir('v-landing')">← Volver al inicio</button>
+    <div class="panel" style="max-width:640px">
+      <h2>Consultar estado</h2>
+      <p class="ayuda" style="margin-bottom:20px">Funciona para reclamos (SGP-…) y pre-autorizaciones (PA-…).</p>
+      <div class="grid2">
+        <div class="campo"><label class="req">Número de radicado</label><input id="t-num"
+            placeholder="SGP-2026-00001 o PA-2026-001" style="font-family:var(--mono)"></div>
+        <div class="campo"><label class="req">Cédula o correo del asegurado</label><input id="t-id"
+            placeholder="8-888-8888 o correo"></div>
+      </div>
+      <button class="btn btn-azul" onclick="buscarTracking()">Consultar</button>
+      <p class="ayuda" style="margin-top:10px">Demo: pruebe <b class="mono">SGP-2026-00003</b> con cédula <b
+          class="mono">8-712-455</b>, o <b class="mono">PA-2026-001</b> con cédula <b class="mono">8-401-220</b>.</p>
+      <div id="t-resultado" class="hidden" style="margin-top:26px">
+        <div style="margin-bottom:14px"><span class="badge b-azul" id="t-estado"></span></div>
+        <div style="font-size:14px" id="t-cabecera"></div>
+        <div class="timeline" id="t-timeline"></div>
+      </div>
+      <p class="error-msg" id="t-error" style="display:none;margin-top:14px">No encontramos una solicitud con esos
+        datos. Verifique el radicado y su identificación.</p>
+    </div>
+  </div>
+
+  <!-- ONBOARDING PROVEEDORES -->
+  <div class="view" id="v-prov">
+    <button class="volver" onclick="ir('v-landing')">← Volver al inicio</button>
+    <div class="panel">
+      <h2>Registro de nuevos proveedores</h2>
+      <p class="ayuda" style="margin-bottom:22px">Para hospitales, clínicas, laboratorios y médicos que desean afiliarse
+        a la red de Dovela Seguros. Complete el expediente en un solo envío; el equipo de Red Médica revisará su
+        solicitud.</p>
+      <div id="prov-form">
+        <div class="grid2">
+          <div class="campo"><label class="req">Razón social / nombre</label><input id="p-nombre">
+            <p class="error-msg">Escriba la razón social.</p>
+          </div>
+          <div class="campo"><label class="req">RUC / cédula</label><input id="p-ruc">
+            <p class="error-msg">Escriba el RUC.</p>
+          </div>
+          <div class="campo"><label class="req">Tipo de proveedor</label>
+            <select id="p-tipo">
+              <option value="">Seleccione…</option>
+              <option>Hospital / clínica</option>
+              <option>Médico especialista</option>
+              <option>Laboratorio / imágenes</option>
+              <option>Farmacia</option>
+              <option>Otro</option>
+            </select>
+            <p class="error-msg">Seleccione el tipo.</p>
+          </div>
+          <div class="campo"><label class="req">Especialidad / servicios</label><input id="p-esp"
+              placeholder="Ej. Ortopedia, urgencias">
+            <p class="error-msg">Indique la especialidad.</p><label
+              style="display:flex;gap:8px;align-items:center;font-weight:500;font-size:13px;margin-top:10px"><input
+                type="checkbox" id="p-tiene-sub" style="width:auto" onchange="SC.togSubesp()"> Posee
+              subespecialidad</label>
+            <div id="p-sub-wrap" class="hidden" style="margin-top:8px"><input id="p-sub"
+                placeholder="Nombre de la subespecialidad"></div>
+          </div>
+          <div class="campo"><label class="req">Persona de contacto</label><input id="p-contacto">
+            <p class="error-msg">Indique un contacto.</p>
+          </div>
+          <div class="campo"><label class="req">Correo</label><input id="p-email" type="email">
+            <p class="error-msg">Correo requerido.</p>
+          </div>
+          <div class="campo"><label class="req">Teléfono</label><input id="p-tel">
+            <p class="error-msg">Teléfono requerido.</p>
+          </div>
+          <div class="campo"><label>Provincia / dirección</label><input id="p-dir"></div>
+        </div>
+        <h3 style="font-family:var(--serif);color:var(--text-primary);margin:14px 0 12px;font-size:17px">Documentos del
+          expediente</h3>
+        <div class="doclist" id="p-docs"></div>
+        <div style="margin-top:22px;display:flex;justify-content:flex-end">
+          <button class="btn btn-verde" onclick="enviarProveedor()">Enviar solicitud →</button>
+        </div>
+      </div>
+      <div id="prov-ok" class="hidden radicado-box">
+        <div class="check-grande"><span class="ico" data-icon="check" aria-hidden="true"></span></div>
+        <h3 style="font-family:var(--serif);color:var(--text-primary);margin-top:18px">Solicitud recibida</h3>
+        <div class="num" id="prov-num"></div>
+        <p style="max-width:440px;margin:0 auto;font-size:14px;color:var(--pizarra)">El equipo de Red Médica revisará su
+          expediente y le contactará al correo registrado.</p>
+        <button class="btn btn-ghost" style="margin-top:20px" onclick="ir('v-landing')">Volver al inicio</button>
+      </div>
+    </div>
+  </div>
+
+
+  <!-- RED MÉDICA -->
+  <div class="view" id="v-red">
+    <button class="volver" onclick="ir('v-landing')">← Volver al inicio</button>
+    <div class="panel" style="max-width:var(--red-max, 1120px)">
+      <h2>Red Médica Dovela</h2>
+      <p class="ayuda" style="margin-bottom:6px">Directorio de prestadores con fines demostrativos. Corte: <b>05 de julio de
+          2026</b>.</p>
+      <div class="tips-foto" style="margin-top:14px"><span class="ico" data-icon="idea" aria-hidden="true"></span> <b>Tip:</b> las condiciones dentro y fuera de la red, como copagos y reembolsos, dependen
+        de su plan. Revíselas en su póliza antes de programar la atención.</div>
+      <div class="grid2" style="margin-top:14px">
+        <div class="campo"><label>Especialidad</label><select id="rm-esp">
+            <option value="">Todas las especialidades</option>
+          </select></div>
+        <div class="campo"><label>Provincia</label><select id="rm-prov">
+            <option value="">Todas las provincias</option>
+          </select></div>
+      </div>
+      <div class="campo"><label>Buscar por nombre, hospital o ciudad</label><input id="rm-q"
+          placeholder="Ej. Valdoria, Serranova, Dra. Okafor…"></div>
+      <p class="ayuda" id="rm-count" style="margin:6px 0 12px"></p>
+      <div style="display:flex;gap:8px;flex-wrap:wrap;margin-bottom:12px">
+        <button class="btn btn-azul btn-sm" onclick="descargarRedPDF(false)"><span class="ico" data-icon="descargar" aria-hidden="true"></span> Descargar directorio completo
+          (PDF)</button>
+        <button class="btn btn-verde btn-sm" onclick="descargarRedXLSX(false)"><span class="ico" data-icon="descargar" aria-hidden="true"></span> Descargar completo (Excel)</button>
+        <button class="btn btn-ghost btn-sm" onclick="descargarRedPDF(true)"><span class="ico" data-icon="documento" aria-hidden="true"></span> Exportar resultados filtrados
+          (PDF)</button>
+        <button class="btn btn-ghost btn-sm" onclick="descargarRedXLSX(true)"><span class="ico" data-icon="grafico" aria-hidden="true"></span> Exportar filtrados (Excel)</button>
+      </div>
+      <div class="chips-esp" id="chips-esp" style="display:flex;gap:6px;flex-wrap:wrap;margin-bottom:12px"></div>
+      <div style="overflow-x:auto;max-height:520px;overflow-y:auto;border:1px solid var(--niebla);border-radius:12px">
+        <table style="width:100%;border-collapse:collapse;font-size:13px">
+          <thead style="position:sticky;top:0;background:var(--bruma);z-index:1">
+            <tr>
+              <th
+                style="text-align:left;padding:9px 11px;color:var(--pizarra);font-size:11px;text-transform:uppercase;letter-spacing:.6px;border-bottom:2px solid var(--niebla)">
+                Especialidad</th>
+              <th
+                style="text-align:left;padding:9px 11px;color:var(--pizarra);font-size:11px;text-transform:uppercase;letter-spacing:.6px;border-bottom:2px solid var(--niebla)">
+                Nombre / Proveedor</th>
+              <th
+                style="text-align:left;padding:9px 11px;color:var(--pizarra);font-size:11px;text-transform:uppercase;letter-spacing:.6px;border-bottom:2px solid var(--niebla)">
+                Dirección</th>
+              <th
+                style="text-align:left;padding:9px 11px;color:var(--pizarra);font-size:11px;text-transform:uppercase;letter-spacing:.6px;border-bottom:2px solid var(--niebla)">
+                Provincia</th>
+              <th
+                style="text-align:left;padding:9px 11px;color:var(--pizarra);font-size:11px;text-transform:uppercase;letter-spacing:.6px;border-bottom:2px solid var(--niebla)">
+                Teléfono</th>
+            </tr>
+          </thead>
+          <tbody id="rm-body"></tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+
+
+  <!-- ==========================================
+     PROGRESO DE ENVÍO
+    </gishikoDev_>
+  ========================================== -->
+
+<div id="envio-progress" class="envio-progress hidden">
+
+    <div class="envio-progress-card">
+
+        <div class="envio-progress-icon" id="envio-progress-icon">
+            <span>↗</span>
+        </div>
+
+        <div class="envio-progress-title">
+            Enviando su reclamo
+        </div>
+
+        <div
+            class="envio-progress-message"
+            id="envio-progress-message"
+        >
+            Preparando la solicitud...
+        </div>
+
+        <div class="envio-progress-track">
+
+            <div
+                id="envio-progress-bar"
+                class="envio-progress-bar"
+            ></div>
+
+        </div>
+
+        <div
+            id="envio-progress-percent"
+            class="envio-progress-percent"
+        >
+            0%
+        </div>
+
+        <div class="envio-progress-note">
+            No cierre esta ventana mientras procesamos su solicitud.
+        </div>
+
+    </div>
+
+</div>
+
+
+
+  <!-- <footer class="gishiko-footer">
+
+    &planckh;&planckh; · gishikoDev_ &#174; · 2026 · Todos los derechos Reservados
+
+    <span>
+
+      "El futuro se programa hoy..."
+
+    </span>
+
+  </footer> -->
+
+  <footer class="gishiko-footer">
+  <div class="footer__content">
+    
+
+    <div class="footer__divider"></div>
+
+      <!-- <p class="footer__signature">
+        Designed & Developed by
+        <strong>Hansel Hernandez</strong>
+        · -->
+  </div>
+
+    <!-- <div class="footer__meta">
+      <p>
+         Portal Autogestion Compañias de Seguros
+      </p>
+      <p class="footer__version">
+        Version 1.1.2 · Alpha
+      </p>      -->
+    </div>
+     <div class="footer__brand">
+      <a
+        class="footer__devtag"
+        href="https://linktr.ee/gishikoDev"
+        target="_blank"
+        rel="me noopener noreferrer"
+        data-devtag-link
+        aria-label="Visitar gishikoDev en Linktree (abre en una pestaña nueva)"
+      >
+        <span class="footer__dev-glow" aria-hidden="true"></span>
+        <span class="footer__dev-ripples" aria-hidden="true"></span>
+        <span class="footer__logo">&lt;/gishikoDev_&gt; &copy;</span>
+        <svg class="footer__dev-icon" viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false"><path d="M7 5h8v8"/><path d="m15 5-9 9"/></svg>
+      </a>
+      <!-- <p>
+        "El futuro se programa hoy..." 
+      </p> -->
+    </div>
+    
+</footer>
+
+<!-- <script>
+document.getElementById("year").textContent = new Date().getFullYear();
+</script> -->
+
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+
+  <script src="public/js/public-supabase.js"></script>
+
+  <script src="public/js/public-repository.js"></script>
+
+  <script src="public/js/public-storageRepository.js"></script>
+
+  <script src="public/js/dovela-logo-pdf.js"></script>
+  <script src="public/js/dovela-forms.js"></script>
+  <script src="public/js/legacy-products.js"></script>
+  <script src="public/js/i18n.js"></script>
+  <script src="public/js/tour.js"></script>
+  <script src="public/js/public-app.js"></script>
+</body>
+
+</html>

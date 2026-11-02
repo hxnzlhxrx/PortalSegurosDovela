@@ -1,0 +1,1110 @@
+<!-- --- </gishikoDev_> 2026 - Hansel Hernandez --- -->
+
+<!DOCTYPE html>
+<html lang="es">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Dovela Seguros · Gestión de Reclamos (Interno)</title>
+  <meta name="robots" content="noindex, nofollow">
+  <meta name="theme-color" content="#F8FAFC">
+  <meta name="color-scheme" content="light dark">
+  <link rel="icon" href="public/assets/brand/favicon.svg" type="image/svg+xml">
+  <link rel="icon" href="public/assets/brand/favicon.ico" sizes="16x16 32x32 48x48">
+  <link rel="apple-touch-icon" href="public/assets/brand/apple-touch-icon.png">
+  <link rel="preload" href="public/assets/fonts/bricolage-grotesque-latin-opsz-normal.woff2" as="font" type="font/woff2" crossorigin>
+
+  <script src="public/js/theme.js"></script>
+  <script src="interno/js/interno-lectura.js"></script>
+  <script src="public/js/iconos.js"></script>
+
+  <link rel="stylesheet" href="public/css/dovela-tokens.css" />
+  <link rel="stylesheet" href="./interno/css/interno-styles.css" />
+  <link rel="stylesheet" href="public/css/tour.css" />
+  <link rel="stylesheet" href="public/css/preloader.css" />
+  <link rel="stylesheet" href="public/css/pulsepoint-theme.css" />
+  <link rel="stylesheet" href="public/css/m3-expressive.css" />
+  <link rel="stylesheet" href="public/css/theme.css" />
+  <link rel="stylesheet" href="interno/css/interno-lectura.css" />
+</head>
+
+<body>
+  <div class="brand-preloader" id="brand-preloader" role="status" aria-live="polite" hidden>
+    <div class="brand-preloader__brand">
+      <img class="brand-preloader__logo" src="public/assets/brand/dovela-logo-stacked-dark.svg" data-logo-light="public/assets/brand/dovela-logo-stacked.svg" data-logo-dark="public/assets/brand/dovela-logo-stacked-dark.svg" width="150" height="122" alt="" aria-hidden="true">
+      <p class="brand-preloader__label">Cargando Dovela&hellip;</p>
+      <div class="brand-preloader__track brand-preloader__spinner" aria-hidden="true">
+        <span class="brand-preloader__dot brand-preloader__dot--blue"></span>
+        <span class="brand-preloader__dot brand-preloader__dot--green"></span>
+        <span class="brand-preloader__dot brand-preloader__dot--amber"></span>
+        <span class="brand-preloader__dot brand-preloader__dot--red"></span>
+      </div>
+    </div>
+  </div>
+  <script src="public/js/preloader.js"></script>
+  <script src="public/js/download-guard.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+
+  <div class="toast" id="toast"></div>
+  <p class="sr-only" id="i18n-announcer" role="status" aria-live="polite"></p>
+
+  <!-- ============ LOGIN ============ -->
+  <div class="login-fondo" id="pantalla-login">
+
+    <svg class="onda" viewBox="6 7.5 52 48.5" aria-hidden="true" focusable="false">
+      <path fill="#fff" d="M6 38A26 26 0 0 1 10.42 23.5L19.55 29.63A15 15 0 0 0 17 38ZM11.54 21.96A26 26 0 0 1 23.06 13.58L26.85 23.91A15 15 0 0 0 20.2 28.74ZM40.94 13.58A26 26 0 0 1 52.46 21.96L43.8 28.74A15 15 0 0 0 37.15 23.91ZM53.58 23.5A26 26 0 0 1 58 38L47 38A15 15 0 0 0 44.45 29.63ZM6 40h11V56h-11ZM47 40h11V56h-11Z" />
+      <path fill="#fff" d="M23.64 8.67A30.5 30.5 0 0 1 40.36 8.67L36.11 23.57A15 15 0 0 0 27.89 23.57Z" />
+    </svg>
+    <div class="login-panel">
+
+      <div class="language-slot">
+          <span class="language-select-wrap">
+            <svg viewBox="0 0 24 24" aria-hidden="true" focusable="false"><circle cx="12" cy="12" r="9"/><path d="M3 12h18M12 3a15 15 0 0 1 0 18M12 3a15 15 0 0 0 0 18"/></svg>
+            <span class="language-code" aria-hidden="true" data-i18n-ignore>ES</span>
+            <select class="language-select" data-language-select aria-label="Idioma">
+              <option value="es">Español</option>
+              <option value="en">English</option>
+              <option value="fr">Français</option>
+              <option value="pt">Português</option>
+            </select>
+          </span>
+      </div>
+
+      <div class="theme-switch-slot">
+        <label class="theme-switch">
+          <input class="theme-switch__input" type="checkbox" role="switch" data-theme-toggle aria-label="Cambiar a modo claro">
+          <span class="theme-switch__track" aria-hidden="true">
+            <span class="theme-switch__thumb"></span>
+            <svg class="theme-switch__icon theme-switch__icon--sun" viewBox="0 0 24 24"><circle cx="12" cy="12" r="3.5"/><path d="M12 2v2M12 20v2M4.93 4.93l1.42 1.42M17.65 17.65l1.42 1.42M2 12h2M20 12h2M4.93 19.07l1.42-1.42M17.65 6.35l1.42-1.42"/></svg>
+            <svg class="theme-switch__icon theme-switch__icon--moon" viewBox="0 0 24 24"><path d="M20 15.2A8.3 8.3 0 0 1 8.8 4a8.4 8.4 0 1 0 11.2 11.2Z"/></svg>
+          </span>
+          <span class="sr-only" data-theme-toggle-label>Cambiar a modo claro</span>
+        </label>
+        <button class="btn-lectura" type="button" data-reading-toggle aria-pressed="false" aria-label="Activar modo lectura" title="Activar modo lectura">
+          <svg viewBox="0 0 24 24" aria-hidden="true" focusable="false"><path d="M2.5 12S6 5.5 12 5.5 21.5 12 21.5 12 18 18.5 12 18.5 2.5 12 2.5 12z"/><circle cx="12" cy="12" r="2.75"/></svg>
+        </button>
+      </div>
+
+      <img id="logo-login" src="public/assets/brand/dovela-logo-horizontal-dark.svg" data-logo-light="public/assets/brand/dovela-logo-horizontal.svg" data-logo-dark="public/assets/brand/dovela-logo-horizontal-dark.svg" width="208" height="64" alt="Dovela Seguros">
+      <div class="sub-marca">Gestión de Reclamos · Uso interno</div>
+      <h2>Acceso equipo Dovela</h2>
+      <p>Operaciones · Reclamos · Red Médica · TI</p>
+      <form onsubmit="loginEquipo(event)">
+        <div class="campo"><label for="l-email">Correo corporativo</label><input id="l-email" type="email"
+            autocomplete="username" inputmode="email" required spellcheck="false" placeholder="usuario@dovela.example"></div>
+        <div class="campo"><label for="l-pass">Contraseña</label><input id="l-pass" type="password"
+            autocomplete="current-password" required placeholder="Ingresar Contraseña"></div>
+        <p class="login-error" id="l-error" role="alert" hidden></p>
+        <button class="btn btn-azul" id="l-entrar" style="width:100%;justify-content:center" type="submit">Ingresar</button>
+        <!-- <p class="ayuda" style="text-align:center;margin-top:12px">Ambiente de demostración · en producción se integra con Microsoft Entra ID (SSO) y control de accesos.</p> -->
+      </form>
+      <br><br>
+      <button class="btn btn-ghost" style="width:100%;justify-content:center"
+        onclick="window.location.href='./index.html'">Volver al Inicio</button>
+      <p class="login-demo-note">Dovela Seguros es una entidad ficticia con fines demostrativos.</p>
+    </div>
+  </div>
+
+  <!-- ============ APP ============ -->
+  <div class="app" id="app">
+    <aside class="sidebar">
+      <div class="marca-side">
+        <img id="logo-side" src="public/assets/brand/dovela-logo-horizontal-dark.svg" width="208" height="64" alt="Dovela Seguros">
+        <div class="sub" id="titulo-portal">Gestión de Reclamos</div>
+        <div class="theme-switch-slot">
+          <span class="language-select-wrap">
+            <svg viewBox="0 0 24 24" aria-hidden="true" focusable="false"><circle cx="12" cy="12" r="9"/><path d="M3 12h18M12 3a15 15 0 0 1 0 18M12 3a15 15 0 0 0 0 18"/></svg>
+            <span class="language-code" aria-hidden="true" data-i18n-ignore>ES</span>
+            <select class="language-select" data-language-select aria-label="Idioma">
+              <option value="es">Español</option>
+              <option value="en">English</option>
+              <option value="fr">Français</option>
+              <option value="pt">Português</option>
+            </select>
+          </span>
+          <label class="theme-switch">
+            <input class="theme-switch__input" type="checkbox" role="switch" data-theme-toggle aria-label="Cambiar a modo claro">
+            <span class="theme-switch__track" aria-hidden="true">
+              <span class="theme-switch__thumb"></span>
+              <svg class="theme-switch__icon theme-switch__icon--sun" viewBox="0 0 24 24"><circle cx="12" cy="12" r="3.5"/><path d="M12 2v2M12 20v2M4.93 4.93l1.42 1.42M17.65 17.65l1.42 1.42M2 12h2M20 12h2M4.93 19.07l1.42-1.42M17.65 6.35l1.42-1.42"/></svg>
+              <svg class="theme-switch__icon theme-switch__icon--moon" viewBox="0 0 24 24"><path d="M20 15.2A8.3 8.3 0 0 1 8.8 4a8.4 8.4 0 1 0 11.2 11.2Z"/></svg>
+            </span>
+            <span class="sr-only" data-theme-toggle-label>Cambiar a modo claro</span>
+          </label>
+          <button class="btn-lectura" type="button" data-reading-toggle aria-pressed="false" aria-label="Activar modo lectura" title="Activar modo lectura">
+            <svg viewBox="0 0 24 24" aria-hidden="true" focusable="false"><path d="M2.5 12S6 5.5 12 5.5 21.5 12 21.5 12 18 18.5 12 18.5 2.5 12 2.5 12z"/><circle cx="12" cy="12" r="2.75"/></svg>
+          </button>
+        </div>
+      </div>
+      <div class="menu">
+        <button class="item" data-tab="bandeja" onclick="tab('bandeja')"><span class="ico" data-icon="bandeja" aria-hidden="true"></span> Bandeja de reclamos</button>
+        <button
+            class="item"
+            data-tab="reservas"
+            onclick="tab('reservas')">
+            <span class="ico" data-icon="portapapeles" aria-hidden="true"></span> Reservas
+        </button>
+        <!-- <button class="item on" data-tab="dash" onclick="tab('dash')"><span class="ico" data-icon="grafico" aria-hidden="true"></span> Tablero</button> -->
+        <!-- <button class="item" data-tab="preauth" id="item-preauth" onclick="tab('preauth')"><span class="ico" data-icon="portapapeles" aria-hidden="true"></span> Pre-autorizaciones</button>
+      <button class="item" data-tab="provs" id="item-provs" onclick="tab('provs')"><span class="ico" data-icon="hospital" aria-hidden="true"></span> Proveedores</button> -->
+        <button class="item" data-tab="red" onclick="tab('red')"><span class="ico" data-icon="mapa" aria-hidden="true"></span> Red Médica</button>
+        <button class="item" data-tab="admin" id="item-admin" onclick="tab('admin')"><span class="ico" data-icon="ajustes" aria-hidden="true"></span> Administración</button>
+      </div>
+      <button class="btn-como-funciona" type="button" onclick="abrirComoFunciona()"><span class="ico" data-icon="idea" aria-hidden="true"></span> Cómo funciona</button>
+      <div class="usuario">
+        <b id="u-nombre"></b><span id="u-rol"></span><br>
+        <button class="btn-link" style="padding:6px 0" onclick="logout()">Cerrar sesión</button>
+      </div>
+    </aside>
+
+    <main class="main">
+
+      <!-- BANDEJA -->
+      <section class="tabpane" id="tab-bandeja">
+        <h2>Bandeja de reclamos</h2>
+        <p class="sub">Todos los reclamos del portal y los importados. Haga clic en una fila para gestionar.</p>
+        <div class="tarjeta">
+          <div class="filtros">
+            <input id="fil-busca" type="search" aria-label="Buscar reclamos" placeholder="Buscar radicado, nombre o cédula…" oninput="pintarBandeja()">
+            <select id="fil-estado" aria-label="Estado" onchange="pintarBandeja()"></select>
+            <select id="fil-linea" aria-label="Línea" onchange="actualizarFiltroProductos(); pintarBandeja()"></select>
+            <select id="fil-producto" aria-label="Producto" onchange="pintarBandeja()"></select>
+            <select id="fil-asig" aria-label="Asignado" onchange="pintarBandeja()"></select>
+            <select id="fil-sla" aria-label="SLA" onchange="pintarBandeja()">
+              <option value="">SLA: todos</option>
+              <option value="en-plazo">En plazo</option>
+              <option value="por-vencer">Por vencer</option>
+              <option value="vencido">Vencido</option>
+              <option value="cumplido">Cumplido</option>
+              <option value="incumplido">Incumplido</option>
+              <option value="sin-sla">Sin SLA</option>
+            </select>
+            <select id="fil-rango" aria-label="Período" onchange="SC.aplicarRango(this.value)">
+              <option value="">Todo el período</option>
+              <option value="mensual">Este mes</option>
+              <option value="trimestral">Últimos 3 meses</option>
+              <option value="semestral">Últimos 6 meses</option>
+              <option value="anual">Últimos 12 meses</option>
+              <option value="personalizado">Personalizado…</option>
+            </select>
+            <input type="date" id="fil-desde" aria-label="Desde" class="hidden" onchange="pintarBandeja()">
+            <input type="date" id="fil-hasta" aria-label="Hasta" class="hidden" onchange="pintarBandeja()">
+            <button class="btn btn-ghost btn-sm" type="button" onclick="limpiarFiltrosBandeja()"><span class="ico" data-icon="cerrar" aria-hidden="true"></span> Limpiar filtros</button>
+            <button class="btn btn-ghost btn-sm" onclick="SC.descargarReporte()"><span class="ico" data-icon="descargar" aria-hidden="true"></span> Descargar reporte</button>
+            <button class="btn btn-ghost btn-sm" onclick="SC.abrirPagosMasivos()"><span class="ico" data-icon="tarjeta" aria-hidden="true"></span> Pagos masivos</button>
+            <span style="flex:1"></span>
+            <!-- <button class="btn btn-ghost btn-sm" onclick="descargarPlantilla()"><span class="ico" data-icon="documento" aria-hidden="true"></span> Plantilla</button>
+          <label class="btn btn-verde btn-sm" style="margin:0"><span class="ico" data-icon="subir" aria-hidden="true"></span> Importar CSV/XLSX
+            <input type="file" class="oculto" accept=".csv,.xlsx,.xls" onchange="importarArchivo(this)"></label>
+          <button class="btn btn-ghost btn-sm" onclick="exportarCSV()"><span class="ico" data-icon="descargar" aria-hidden="true"></span> Exportar CSV</button> -->
+            <button class="btn btn-ghost" onclick="cargarBandeja()">
+
+              <span class="ico" data-icon="carpeta" aria-hidden="true"></span> Bandeja
+
+            </button>
+            <button class="btn btn-ghost" onclick="verArchivados()">
+
+              <span class="ico" data-icon="archivo" aria-hidden="true"></span> Archivados
+
+            </button>
+
+          </div>
+          <div class="sla-resumen" id="sla-resumen" role="status"></div>
+          <div class="tabla-scroll">
+            <table>
+              <thead>
+                <tr>
+                  <th>Radicado</th>
+                  <th>Asegurado</th>
+                  <th>Línea</th>
+                  <th>Producto</th>
+                  <th>Monto</th>
+                  <th>Recibido</th>
+                  <th>Estado</th>
+                  <th>SLA</th>
+                  <th>Genelco</th>
+                  <th>Asignado a</th>
+                </tr>
+              </thead>
+              <tbody id="tbody-bandeja"></tbody>
+            </table>
+          </div>
+          <p id="tbody-bandeja-status" class="table-status" role="status" aria-live="polite" aria-atomic="true"></p>
+        </div>
+      </section>
+
+      <!-- DETALLE RECLAMO -->
+      <section class="tabpane hidden" id="tab-detalle">
+            <button class="btn-link detalle-volver" onclick="volverDesdeDetalle()">← Volver a la bandeja</button>
+        <div id="detalle-body"></div>
+      </section>
+
+    <!-- =========================================
+               RESERVAS <gishikoDev_>
+    ========================================= -->
+
+<section class="tabpane hidden" id="tab-reservas">
+
+  <h2>Reservas</h2>
+
+  <p class="sub">
+    Reservas registradas en el portal y cargadas mediante procesos de importación.
+  </p>
+
+  <div class="tarjeta">
+    <div class="filtros">
+      <input
+        id="fil-reserva-busca"
+        placeholder="Buscar número, nombre, cédula o póliza…"
+        oninput="pintarReservas()">
+
+      <select
+        id="fil-reserva-estado"
+        onchange="pintarReservas()">
+        <option value="">
+          Todos los estados
+        </option>
+      </select>
+
+      <select
+        id="fil-reserva-linea"
+        onchange="pintarReservas()">
+        <option value="">
+          Todas las líneas
+        </option>
+      </select>
+
+      <select
+        id="fil-reserva-producto"
+        onchange="pintarReservas()">
+        <option value="">
+          Todos los productos
+        </option>
+      </select>
+
+      <button
+  class="btn btn-ghost btn-sm"
+  onclick="descargarPlantillaReservas()">
+  <span class="ico" data-icon="documento" aria-hidden="true"></span> Plantilla
+</button>
+
+<label
+  class="btn btn-verde btn-sm"
+  style="margin:0">
+  <span class="ico" data-icon="subir" aria-hidden="true"></span> Importar Excel/CSV
+
+  <input
+    id="archivo-importar-reservas"
+    type="file"
+    class="oculto"
+    accept=".xlsx,.xls,.csv"
+    onchange="seleccionarArchivoReservas(this)">
+</label>
+
+<button
+  class="btn btn-ghost btn-sm"
+  onclick="abrirModalReporteReservas()">
+  <span class="ico" data-icon="descargar" aria-hidden="true"></span> Descargar reporte
+</button>
+
+      <button
+        class="btn btn-ghost"
+        onclick="cargarReservas()">
+        <span class="ico" data-icon="actualizar" aria-hidden="true"></span> Actualizar
+      </button>
+
+    </div>
+    <div class="tabla-scroll">
+      <table>
+        <thead>
+          <tr>
+            <th>Número</th>
+            <th>Asegurado</th>
+            <th>Línea</th>
+            <th>Producto</th>
+            <th>Póliza</th>
+            <th>Monto</th>
+            <th>Recibido</th>
+            <th>Estado</th>
+            <th>SLA</th>
+          </tr>
+        </thead>
+        <tbody id="tbody-reservas"></tbody>
+      </table>
+    </div>
+    <p id="tbody-reservas-status" class="table-status" role="status" aria-live="polite" aria-atomic="true"></p>
+  </div>
+</section>
+
+<!-- =========================================
+     DETALLE RESERVA <gishikoDev_>
+========================================= -->
+
+<section class="tabpane hidden" id="tab-detalle-reserva">
+
+    <button
+        class="btn-link"
+        onclick="volverDesdeDetalleReserva()"
+    >
+        ← Volver a Reservas
+    </button>
+
+    <div id="detalle-reserva-body"></div>
+
+</section>
+
+      <!-- TABLERO -->
+      <section class="tabpane" id="tab-dash">
+        <h2>Tablero de reclamos</h2>
+        <p class="sub">Vista consolidada de la operación · indicadores en línea del portal.</p>
+        <div class="kpis" id="kpis"></div>
+        <div class="dash-grid">
+          <div class="tarjeta">
+            <h3>Reclamos por estado</h3>
+            <div class="barras" id="chart-estados"></div>
+          </div>
+          <div class="tarjeta">
+            <h3>Por línea de negocio</h3>
+            <div class="barras" id="chart-lineas"></div>
+          </div>
+        </div>
+        <div class="dash-grid">
+          <div class="tarjeta">
+            <h3>Por producto (póliza)</h3>
+            <div class="barras" id="chart-productos"></div>
+          </div>
+          <div class="tarjeta">
+            <h3>Monto reclamado vs pagado</h3>
+            <div class="barras" id="chart-montos"></div>
+          </div>
+        </div>
+        <div class="tarjeta">
+          <h3>Alertas de gestión (SLA <span id="sla-label"></span> días)</h3>
+          <div id="alertas"></div>
+        </div>
+      </section>
+
+      <!-- PRE-AUTORIZACIONES -->
+      <section class="tabpane hidden" id="tab-preauth">
+        <h2>Pre-autorizaciones médicas</h2>
+        <p class="sub">Solicitudes de hospitalización, cirugías y estudios · evaluación de médicos asesores.</p>
+        <div class="tarjeta">
+          <div class="filtros">
+            <input id="pa-busca" placeholder="Buscar N°, asegurado o paciente…" oninput="pintarPA()">
+            <select id="pa-fil-estado" onchange="pintarPA()"></select>
+            <select id="pa-fil-tipo" onchange="pintarPA()"></select>
+            <select id="pa-fil-asig" onchange="pintarPA()"></select>
+            <span style="flex:1"></span>
+            <button class="btn btn-ghost btn-sm" onclick="descargarPlantillaPA()"><span class="ico" data-icon="documento" aria-hidden="true"></span> Plantilla</button>
+            <label class="btn btn-verde btn-sm" style="margin:0"><span class="ico" data-icon="subir" aria-hidden="true"></span> Importar CSV/XLSX
+              <input type="file" class="oculto" accept=".csv,.xlsx,.xls" onchange="importarArchivoPA(this)"></label>
+            <button class="btn btn-ghost btn-sm" onclick="exportarCSV_PA()"><span class="ico" data-icon="descargar" aria-hidden="true"></span> Exportar CSV</button>
+          </div>
+          <div class="tabla-scroll">
+            <table>
+              <thead>
+                <tr>
+                  <th>N°</th>
+                  <th>Asegurado / paciente</th>
+                  <th>Tipo</th>
+                  <th>Recibida</th>
+                  <th>Estado</th>
+                  <th>Autorización</th>
+                  <th>Asignado a</th>
+                </tr>
+              </thead>
+              <tbody id="tbody-pa"></tbody>
+            </table>
+          </div>
+        </div>
+      </section>
+
+      <!-- DETALLE PA -->
+      <section class="tabpane hidden" id="tab-detalle-pa">
+        <button class="btn-link" onclick="tab('preauth')">← Volver a pre-autorizaciones</button>
+        <div id="detalle-pa-body" data-i18n-ignore></div>
+      </section>
+
+      <!-- PROVEEDORES -->
+      <section class="tabpane hidden" id="tab-provs">
+        <h2>Solicitudes de proveedores</h2>
+        <p class="sub">Expedientes de afiliación · gestión de Red Médica. Haga clic en una fila para gestionar.</p>
+        <div class="tarjeta">
+          <div class="tabla-scroll">
+            <table>
+              <thead>
+                <tr>
+                  <th>N° solicitud</th>
+                  <th>Proveedor</th>
+                  <th>Tipo</th>
+                  <th>Especialidad</th>
+                  <th>Contacto</th>
+                  <th>Teléfono</th>
+                  <th>Recibido</th>
+                  <th>Estado</th>
+                </tr>
+              </thead>
+              <tbody id="tbody-provs"></tbody>
+            </table>
+          </div>
+        </div>
+      </section>
+
+      <!-- DETALLE PROVEEDOR -->
+      <section class="tabpane hidden" id="tab-detalle-prov">
+        <button class="btn-link" onclick="tab('provs')">← Volver a proveedores</button>
+        <div id="detalle-prov-body"></div>
+      </section>
+
+      <!-- RED MÉDICA -->
+      <section class="tabpane hidden" id="tab-red">
+        <h2>Red Médica Dovela</h2>
+        <p class="sub">Directorio oficial · <b id="red-total"></b> prestadores contratados · corte 05 jul 2026.</p>
+        <div class="tarjeta">
+          <div class="filtros">
+            <input id="ir-q" placeholder="Buscar nombre, hospital, ciudad…" oninput="pintarRed()"
+              style="min-width:220px">
+            <select id="ir-esp" onchange="pintarRed()">
+              <option value="">Todas las especialidades</option>
+            </select>
+            <select id="ir-prov" onchange="pintarRed()">
+              <option value="">Todas las provincias</option>
+            </select>
+            <span style="flex:1"></span>
+            <button class="btn btn-ghost btn-sm" onclick="exportarRedCSV()"><span class="ico" data-icon="descargar" aria-hidden="true"></span> Exportar CSV</button>
+          </div>
+          <p class="ayuda" id="ir-count" style="margin:0 0 10px"></p>
+          <div class="tabla-scroll" style="max-height:560px;overflow-y:auto">
+            <table>
+              <thead>
+                <tr>
+                  <th>Especialidad</th>
+                  <th>Nombre / Proveedor</th>
+                  <th>Dirección</th>
+                  <th>Provincia</th>
+                  <th>Ciudad</th>
+                  <th>Teléfono</th>
+                </tr>
+              </thead>
+              <tbody id="ir-body"></tbody>
+            </table>
+          </div>
+        </div>
+      </section>
+
+      <!-- ADMINISTRACIÓN (Configuración del Portal) -->
+      <section class="tabpane" id="tab-admin">
+        <h2>Configuración del Portal</h2>
+        <p class="sub">Módulo avanzado exclusivo para TI. Personalice el portal, catálogos, SLAs y auditoría sin tocar
+          código.</p>
+        <div class="subtabs" id="admin-subtabs">
+          <button class="subtab on" data-sub="usuarios" onclick="subtab('usuarios')"><span class="ico" data-icon="usuarios" aria-hidden="true"></span> Usuarios y Roles</button>
+          <button class="subtab" data-sub="cms" onclick="subtab('cms')"><span class="ico" data-icon="imagen" aria-hidden="true"></span> Portal Público (CMS)</button>
+          <button class="subtab" data-sub="sla" onclick="subtab('sla')"><span class="ico" data-icon="reloj" aria-hidden="true"></span> SLAs por proceso</button>
+          <button class="subtab" data-sub="cats" onclick="subtab('cats')"><span class="ico" data-icon="catalogo" aria-hidden="true"></span> Catálogos</button>
+          <button class="subtab" data-sub="red" onclick="subtab('red')"><span class="ico" data-icon="mapa" aria-hidden="true"></span> Red Médica</button>
+          <button class="subtab" data-sub="plant" onclick="subtab('plant')"><span class="ico" data-icon="documento" aria-hidden="true"></span> Plantillas</button>
+          <button class="subtab" data-sub="mail" onclick="subtab('mail')"><span class="ico" data-icon="correo" aria-hidden="true"></span> Correos</button>
+          <button class="subtab" data-sub="param" onclick="subtab('param')"><span class="ico" data-icon="ajustes" aria-hidden="true"></span> Parámetros</button>
+          <button class="subtab" data-sub="audit" onclick="subtab('audit')"><span class="ico" data-icon="buscar" aria-hidden="true"></span> Auditoría</button>
+          <button class="subtab" onclick="subtab('firmas')" data-sub="firmas"><span class="ico" data-icon="firma" aria-hidden="true"></span> Firmas digitales</button>
+          <button class="subtab" onclick="subtab('forms')" data-sub="forms"><span class="ico" data-icon="documento" aria-hidden="true"></span> Formularios dinámicos</button>
+        </div>
+
+        <!-- Usuarios -->
+        <div class="sublit" id="sub-usuarios">
+          <div class="tarjeta">
+            <div style="display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:10px">
+              <h3 style="margin:0">Usuarios del equipo</h3>
+              <button class="btn btn-azul btn-sm" onclick="abrirModalUsuario(-1)"><span class="ico" data-icon="mas" aria-hidden="true"></span> Crear usuario</button>
+            </div>
+            <div class="tabla-scroll" style="margin-top:14px">
+              <table>
+                <thead>
+                  <tr>
+                    <th>Nombre</th>
+                    <th>Correo</th>
+                    <th>Rol funcional</th>
+                    <th>Perfil</th>
+                    <th>Estado</th>
+                    <th></th>
+                  </tr>
+                </thead>
+                <tbody id="tbody-users"></tbody>
+              </table>
+            </div>
+          </div>
+          <div class="tarjeta">
+            <h3>Roles y permisos</h3>
+            <p class="ayuda">Cree perfiles adicionales sin programación. Los cambios aplican al próximo inicio de
+              sesión.</p>
+            <div class="tabla-scroll" style="margin-top:10px">
+              <table>
+                <thead>
+                  <tr>
+                    <th>Rol</th>
+                    <th>Acceso</th>
+                    <th>Editar reclamos</th>
+                    <th>Ver admin</th>
+                  </tr>
+                </thead>
+                <tbody id="tbody-roles"></tbody>
+              </table>
+            </div>
+          </div>
+        </div>
+
+        <!-- CMS -->
+        <div class="sublit hidden" id="sub-cms">
+          <div class="tarjeta">
+            <div style="display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:10px">
+              <h3 style="margin:0">Banner dinámico del Portal Público</h3>
+              <button class="btn btn-azul btn-sm" onclick="agregarBanner()"><span class="ico" data-icon="mas" aria-hidden="true"></span> Nuevo banner</button>
+            </div>
+            <p class="ayuda">Novedades del carrusel de la portada. El portal público muestra solo los banners activos
+              dentro de su vigencia, en el orden de esta tabla.</p>
+            <div class="tabla-scroll" style="margin-top:12px">
+              <table>
+                <thead>
+                  <tr>
+                    <th>Orden</th>
+                    <th>Novedad</th>
+                    <th>Vigencia</th>
+                    <th>Destino</th>
+                    <th>Estado</th>
+                    <th></th>
+                  </tr>
+                </thead>
+                <tbody id="tbody-banners"></tbody>
+              </table>
+            </div>
+          </div>
+          <div class="tarjeta">
+            <h3>Identidad del portal</h3>
+            <div class="grid2">
+              <div class="campo">
+                <label>Logo del portal</label>
+                <div class="cms-logo"><img id="cfg-logo-prev" src="public/assets/brand/dovela-logo-horizontal-dark.svg" width="208" height="64" alt="Logo actual del portal"></div>
+                <div style="display:flex;gap:8px;flex-wrap:wrap">
+                  <label class="btn btn-ghost btn-sm" style="margin:0"><span class="ico" data-icon="imagen" aria-hidden="true"></span> Cargar nueva imagen
+                    <input type="file" class="oculto" accept="image/png,image/svg+xml,image/webp,image/jpeg" onchange="cambiarLogo(this)"></label>
+                  <button class="btn btn-ghost btn-sm" id="cfg-logo-restaurar" onclick="restaurarLogo()">Restaurar logo original</button>
+                </div>
+                <p class="ayuda">PNG, SVG o WebP de hasta 200 KB, con fondo transparente. Se muestra en el encabezado del
+                  portal público y en el portal interno.</p>
+              </div>
+              <div class="campo"><label for="cfg-titulo">Nombre del módulo</label>
+                <input id="cfg-titulo" maxlength="60">
+                <button class="btn btn-azul btn-sm" style="margin-top:8px" onclick="guardarTituloPortal()">Guardar nombre</button>
+                <p class="ayuda">Aparece bajo el logo en el menú del portal interno.</p>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- SLAs -->
+        <div class="sublit hidden" id="sub-sla">
+          <div class="tarjeta">
+            <h3>SLA por proceso</h3>
+            <p class="ayuda">Plazo de resolución por proceso, línea y producto. Se aplica la regla más específica
+              (producto, luego línea, luego la general del proceso). El conteo empieza en la recepción —o en el inicio de
+              tramitación si llegó durante un Freeze— y termina al pasar a Pagado o Rechazado. Los días hábiles excluyen
+              fines de semana y los feriados de Parámetros.</p>
+            <div class="tabla-scroll" style="margin-top:12px">
+              <table>
+                <thead>
+                  <tr>
+                    <th>Proceso</th>
+                    <th>Línea</th>
+                    <th>Producto</th>
+                    <th>Plazo</th>
+                    <th>Unidad</th>
+                    <th></th>
+                  </tr>
+                </thead>
+                <tbody id="tbody-sla"></tbody>
+              </table>
+            </div>
+            <div class="campo" style="max-width:360px;margin-top:14px"><label for="sla-aviso">Aviso «Por vencer» al consumir (%) del plazo</label>
+              <input id="sla-aviso" type="number" min="1" max="99" step="1" onchange="setAvisoSLA(this.value)"></div>
+            <div style="display:flex;gap:10px;flex-wrap:wrap;align-items:center;margin-top:12px">
+              <button class="btn btn-ghost btn-sm" onclick="agregarSLA()"><span class="ico" data-icon="mas" aria-hidden="true"></span> Nuevo SLA</button>
+              <span style="flex:1"></span>
+              <span class="ayuda" id="sla-estado" role="status"></span>
+              <button class="btn btn-ghost btn-sm" onclick="descartarSLA()">Descartar cambios</button>
+              <button class="btn btn-azul btn-sm" id="sla-guardar" onclick="guardarSLAs()"><span class="ico" data-icon="guardar" aria-hidden="true"></span> Guardar SLAs</button>
+            </div>
+          </div>
+        </div>
+
+        <!-- Catálogos -->
+        <div class="sublit hidden" id="sub-cats">
+          <div class="tarjeta">
+            <h3>Catálogos del sistema</h3>
+            <p class="ayuda">Alta, baja y modificación de valores sin cambios en BD.</p>
+            <div class="filtros"><select id="cat-sel" onchange="pintarCat()"></select>
+              <input id="cat-nuevo" placeholder="Nuevo valor…">
+              <button class="btn btn-azul btn-sm" onclick="agregarCat()"><span class="ico" data-icon="mas" aria-hidden="true"></span> Agregar</button>
+            </div>
+            <div class="tabla-scroll">
+              <table>
+                <thead>
+                  <tr>
+                    <th>Valor</th>
+                    <th></th>
+                  </tr>
+                </thead>
+                <tbody id="tbody-cat"></tbody>
+              </table>
+            </div>
+          </div>
+        </div>
+
+        <!-- Red médica admin -->
+        <div class="sublit hidden" id="sub-red">
+          <div class="tarjeta">
+            <h3>Gestión de Red Médica</h3>
+            <p class="ayuda">Importe Excel, altas individuales, bajas lógicas, versionamiento e historial.</p>
+            <div class="filtros">
+              <label class="btn btn-verde btn-sm" style="margin:0"><span class="ico" data-icon="subir" aria-hidden="true"></span> Importar Excel
+                <input type="file" class="oculto" accept=".xlsx,.xls,.csv" onchange="importarRed(this)"></label>
+              <button class="btn btn-ghost btn-sm" onclick="exportarRedCSV()"><span class="ico" data-icon="descargar" aria-hidden="true"></span> Exportar CSV</button>
+              <button class="btn btn-azul btn-sm" onclick="altaMedico()"><span class="ico" data-icon="mas" aria-hidden="true"></span> Alta individual</button>
+              <span style="flex:1"></span>
+              <span class="ayuda"><b id="red-count-admin">0</b> prestadores · v<b id="red-version">1</b></span>
+            </div>
+            <div class="tabla-scroll">
+              <table>
+                <thead>
+                  <tr>
+                    <th>Historial</th>
+                    <th>Fecha</th>
+                    <th>Usuario</th>
+                    <th>Acción</th>
+                  </tr>
+                </thead>
+                <tbody id="tbody-red-hist"></tbody>
+              </table>
+            </div>
+          </div>
+        </div>
+
+        <!-- Plantillas -->
+        <div class="sublit hidden" id="sub-plant">
+          <div class="tarjeta">
+            <h3>Plantillas de documentos</h3>
+            <p class="ayuda">Editor de plantillas con variables dinámicas y bloques de firma. Sin desarrollo.</p>
+            <div class="filtros"><select id="plant-sel" onchange="pintarPlantilla()"></select>
+              <button class="btn btn-ghost btn-sm" onclick="previsualizarPlantilla()"><span class="ico" data-icon="ver" aria-hidden="true"></span> Previsualizar</button>
+              <button class="btn btn-azul btn-sm" onclick="guardarPlantilla()"><span class="ico" data-icon="guardar" aria-hidden="true"></span> Guardar</button>
+            </div>
+            <div class="grid2">
+              <div class="campo"><label>Asunto / título</label><input id="plant-titulo"></div>
+              <div class="campo"><label>Variables disponibles</label><input
+                  value="{nombre} {numero} {fecha} {estado} {monto} {motivo}" disabled></div>
+            </div>
+            <div class="campo"><label>Cuerpo</label><textarea id="plant-body" rows="10"
+                style="font-family:var(--mono);font-size:12.5px"></textarea></div>
+          </div>
+        </div>
+
+        <!-- Correos -->
+        <div class="sublit hidden" id="sub-mail">
+          <div class="tarjeta">
+            <h3>Correos automáticos</h3>
+            <p class="ayuda">Configure las notificaciones que dispara el sistema en cada evento.</p>
+            <div class="tabla-scroll">
+              <table>
+                <thead>
+                  <tr>
+                    <th>Evento</th>
+                    <th>Destinatarios</th>
+                    <th>Plantilla</th>
+                    <th>Activo</th>
+                  </tr>
+                </thead>
+                <tbody id="tbody-mail"></tbody>
+              </table>
+            </div>
+          </div>
+        </div>
+
+        <!-- Parámetros -->
+        <div class="sublit hidden" id="sub-param">
+          <div class="tarjeta">
+            <h3>Parámetros operativos</h3>
+            <div class="grid2">
+              <div class="campo"><label>Horario laboral</label><input id="cfg-horario" value="Lun–Vie 08:00–17:00"
+                  onchange="guardarParam()"></div>
+              <div class="campo"><label>Feriados nacionales (separados por coma)</label><input id="cfg-feriados"
+                  placeholder="01-ene, 03-nov, 25-dic" onchange="guardarFeriados()"></div>
+              <div class="campo"><label>Escalamiento tras (días)</label><input id="cfg-escal" type="number" value="3"
+                  onchange="guardarParam()"></div>
+            </div>
+            <div class="campo"><label>Módulos visibles</label>
+              <label
+                style="display:flex;gap:8px;align-items:center;font-weight:500;font-size:13.5px;margin-top:6px"><input
+                  type="checkbox" id="cfg-mod-pa" style="width:auto" onchange="aplicarConfig()">
+                Pre-autorizaciones</label>
+              <label
+                style="display:flex;gap:8px;align-items:center;font-weight:500;font-size:13.5px;margin-top:6px"><input
+                  type="checkbox" id="cfg-mod-prov" style="width:auto" onchange="aplicarConfig()"> Proveedores</label>
+            </div>
+          </div>
+          <div class="tarjeta" style="margin-top:20px">
+            <h3>Freeze operativo</h3>
+            <p class="ayuda">Los reclamos recibidos dentro de un periodo entran a la cola operativa en la fecha de inicio de tramitación (hora de Panamá). Se muestra en el detalle del reclamo como «Programación operativa»; no cambia su estado ni su radicado. Los días hábiles excluyen fines de semana y los feriados configurados arriba.</p>
+            <div class="tabla-scroll">
+              <table class="tabla-freeze">
+                <thead>
+                  <tr>
+                    <th>Nombre del periodo</th>
+                    <th>Desde</th>
+                    <th>Hasta</th>
+                    <th>Inicio de tramitación</th>
+                    <th>Activo</th>
+                    <th></th>
+                  </tr>
+                </thead>
+                <tbody id="freeze-tbody"></tbody>
+              </table>
+            </div>
+            <div style="display:flex;gap:10px;flex-wrap:wrap;margin-top:12px">
+              <button class="btn btn-ghost btn-sm" type="button" onclick="agregarPeriodoFreeze()"><span class="ico" data-icon="mas" aria-hidden="true"></span> Agregar periodo</button>
+              <button class="btn btn-verde btn-sm" type="button" onclick="guardarPeriodosFreeze()"><span class="ico" data-icon="guardar" aria-hidden="true"></span> Guardar periodos</button>
+            </div>
+          </div>
+        </div>
+
+        <!-- Auditoría -->
+        <div class="sublit hidden" id="sub-audit">
+          <div class="tarjeta">
+            <h3>Auditoría de configuración</h3>
+            <p class="ayuda">Toda modificación registra usuario, fecha/hora, valor anterior y nuevo.</p>
+            <div class="tabla-scroll">
+              <table>
+                <thead>
+                  <tr>
+                    <th>Fecha/Hora</th>
+                    <th>Usuario</th>
+                    <th>Acción</th>
+                    <th>Anterior</th>
+                    <th>Nuevo</th>
+                  </tr>
+                </thead>
+                <tbody id="tbody-audit"></tbody>
+              </table>
+            </div>
+          </div>
+        </div>
+
+        <div class="sublit hidden" id="sub-firmas">
+          <div class="tarjeta">
+            <h3>Firmas digitales por usuario</h3>
+            <p class="ayuda">La firma se aplica automáticamente en las cartas de pre-autorización según el usuario
+              aprobador. Solo IT / Administrador puede cargar o modificar.</p>
+            <table>
+              <thead>
+                <tr>
+                  <th>Usuario</th>
+                  <th>Rol</th>
+                  <th>Firma cargada</th>
+                  <th>Acción</th>
+                </tr>
+              </thead>
+              <tbody id="tbody-firmas"></tbody>
+            </table>
+          </div>
+        </div>
+        <div class="sublit hidden" id="sub-forms">
+          <div class="tarjeta">
+            <h3>Formularios dinámicos (PDF u otros)</h3>
+            <p class="ayuda">Cargue el formulario vigente por tipo de reclamo/gestión. El portal público consumirá
+              siempre la última versión activa.</p>
+            <div class="filtros">
+              <select id="forms-tipo">
+                <option value="SI">Salud Individual</option>
+                <option value="SC">Salud Colectivo</option>
+                <option value="AP">Accidentes Personales</option>
+                <option value="VD">Vida</option>
+                <option value="PA">Pre-autorización</option>
+                <option value="PROV">Registro de proveedores</option>
+              </select>
+              <input type="file" id="forms-file" accept=".pdf,.doc,.docx">
+              <button class="btn btn-azul btn-sm" onclick="SC.subirFormulario()">Publicar nueva versión</button>
+            </div>
+            <table>
+              <thead>
+                <tr>
+                  <th>Tipo</th>
+                  <th>Formulario</th>
+                  <th>Versión</th>
+                  <th>Publicado</th>
+                  <th>Estado</th>
+                  <th>Acción</th>
+                </tr>
+              </thead>
+              <tbody id="tbody-forms"></tbody>
+            </table>
+          </div>
+        </div>
+      </section>
+    </main>
+  </div>
+
+  <!-- MODAL USUARIO -->
+  <div class="modal-fondo" id="modal-usuario">
+    <div class="modal">
+      <h3 id="mu-titulo">Crear usuario</h3>
+      <div class="grid2">
+        <div class="campo"><label>Nombre completo</label><input id="mu-nombre"></div>
+        <div class="campo"><label>Correo corporativo</label><input id="mu-email" placeholder="usuario@dovela.example">
+        </div>
+        <div class="campo"><label for="mu-rol">Rol</label>
+          <select id="mu-rol">
+            <option value="">Seleccione…</option>
+            <option value="Admin">Admin</option>
+            <option value="Ajustador">Ajustador</option>
+            <option value="Visualizador">Visualizador</option>
+          </select>
+        </div>
+        <div class="campo"><label>Perfil de acceso</label>
+          <select id="mu-perfil">
+            <option value="admin">Administrador IT</option>
+            <option value="gerencia">Gerencia</option>
+            <option value="lider">Líder (supervisión)</option>
+            <option value="coordinador">Coordinación</option>
+            <option value="reclamos">Reclamos</option>
+            <option value="contabilidad">Contabilidad</option>
+            <option value="atencion">Atención al Cliente</option>
+            <option value="ventas">Ventas</option>
+            <option value="operaciones">Operaciones</option>
+            <option value="suscripcion">Suscripción</option>
+            <option value="auditoria">Auditoría</option>
+            <option value="especialista">Gestión de reclamos</option>
+          </select>
+        </div>
+      </div>
+      <p class="ayuda" id="mu-ayuda">La contraseña no se define aquí: cree la cuenta de acceso en Supabase (Authentication → Users → Add user) con este mismo correo. Se vincula automáticamente.</p>
+      <div style="display:flex;justify-content:flex-end;gap:10px;margin-top:8px">
+        <button class="btn btn-ghost btn-sm" onclick="cerrarModalUsuario()">Cancelar</button>
+        <button class="btn btn-azul btn-sm" onclick="guardarUsuario()">Guardar</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ============ MODAL BANNER (CMS) ============ -->
+  <div class="modal-fondo" id="modal-banner">
+    <div class="modal" style="max-width:640px" role="dialog" aria-modal="true" aria-labelledby="mb-titulo-modal">
+      <h3 id="mb-titulo-modal">Nuevo banner</h3>
+      <div class="campo"><label for="mb-titulo">Título</label>
+        <input id="mb-titulo" maxlength="90" oninput="previsualizarBanner()"></div>
+      <div class="campo"><label for="mb-texto">Texto</label>
+        <textarea id="mb-texto" rows="2" maxlength="220" oninput="previsualizarBanner()"></textarea></div>
+      <div class="grid2">
+        <div class="campo"><label for="mb-destino">Destino del botón</label>
+          <select id="mb-destino" onchange="cambiarDestinoBanner()">
+            <option value="">Sin botón</option>
+            <option value="#v-wizard">Presentar un reclamo</option>
+            <option value="#v-claim-status">Consultar estado de reclamo</option>
+            <option value="#pasos-title">Cómo presentar un reclamo</option>
+            <option value="#sec-formularios">Formularios</option>
+            <option value="#v-red">Red Médica</option>
+            <option value="externo">Enlace externo (https)</option>
+          </select>
+        </div>
+        <div class="campo"><label for="mb-boton">Texto del botón</label>
+          <input id="mb-boton" maxlength="40" oninput="previsualizarBanner()"></div>
+      </div>
+      <div class="campo hidden" id="mb-url-campo"><label for="mb-url">Enlace externo</label>
+        <input id="mb-url" type="url" placeholder="https://" oninput="previsualizarBanner()"></div>
+      <div class="grid2">
+        <div class="campo"><label for="mb-desde">Visible desde</label><input id="mb-desde" type="date"></div>
+        <div class="campo"><label for="mb-hasta">Visible hasta</label><input id="mb-hasta" type="date"></div>
+      </div>
+      <label style="display:flex;gap:8px;align-items:center;margin:4px 0 12px"><input type="checkbox" id="mb-activo"
+          style="width:auto"> Activo (se publica dentro de su vigencia)</label>
+      <p class="ayuda" style="margin-bottom:6px">Vista previa</p>
+      <div class="cms-preview" id="mb-preview" aria-live="polite"></div>
+      <p class="cms-error" id="mb-error" role="alert" hidden></p>
+      <div style="display:flex;justify-content:flex-end;gap:10px;margin-top:14px">
+        <button class="btn btn-ghost btn-sm" onclick="cerrarModalBanner()">Cancelar</button>
+        <button class="btn btn-azul btn-sm" id="mb-guardar" onclick="guardarBanner()">Guardar banner</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ============ MODAL PAGOS MASIVOS ============ -->
+  <div class="modal-fondo hidden" id="modal-pagos">
+    <div class="modal" style="max-width:820px">
+      <h3><span class="ico" data-icon="tarjeta" aria-hidden="true"></span> Carga masiva de pagos</h3>
+      <p class="ayuda">Cargue un archivo <b>CSV</b> o <b>TXT</b> con las columnas:
+        <code>radicado, monto_pagado, genelco, estado</code>. Aceptamos archivos de CheckPlus o pagos bancarios (Global
+        Bank / St. George).</p>
+      <div class="grid">
+        <div class="campo"><label>Archivo</label><input type="file" id="pm-file" accept=".csv,.txt"
+            onchange="SC.previewPagos()"></div>
+        <div class="campo"><label>Origen del archivo</label><select id="pm-origen">
+            <option>CheckPlus</option>
+            <option>Global Bank</option>
+            <option>Banco St. George</option>
+            <option>Otro</option>
+          </select></div>
+      </div>
+      <div id="pm-preview" style="margin-top:16px"></div>
+      <div class="modal-acciones">
+        <button class="btn btn-ghost" onclick="SC.cerrarPagosMasivos()">Cancelar</button>
+        <button class="btn btn-azul" onclick="SC.procesarPagos()">Procesar lote</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- =========================================
+     MODAL IMPORTAR RESERVAS
+========================================= -->
+
+<div
+  class="modal-fondo"
+  id="modal-importar-reservas">
+
+  <div
+    class="modal"
+    style="max-width:960px">
+
+    <h3>
+      <span class="ico" data-icon="subir" aria-hidden="true"></span> Importar Reservas
+    </h3>
+
+    <p class="ayuda">
+      Revise los registros antes de enviarlos a la base de datos.
+      Los números de reserva que ya existan no serán modificados.
+    </p>
+
+    <div
+      id="reservas-import-resumen"
+      style="margin:16px 0">
+    </div>
+
+    <div
+      id="reservas-import-preview"
+      class="tabla-scroll"
+      style="max-height:420px">
+    </div>
+
+    <div
+      style="
+        display:flex;
+        justify-content:flex-end;
+        gap:10px;
+        margin-top:18px;
+      ">
+
+      <button
+        class="btn btn-ghost"
+        onclick="cerrarModalImportarReservas()">
+        Cancelar
+      </button>
+
+      <button
+        class="btn btn-azul"
+        id="btn-confirmar-importacion-reservas"
+        onclick="confirmarImportacionReservas()">
+        Importar reservas
+      </button>
+    </div>
+  </div>
+</div>
+
+<!-- =========================================
+     MODAL REPORTE RESERVAS
+========================================= -->
+
+<div
+  class="modal-fondo"
+  id="modal-reporte-reservas">
+
+  <div
+    class="modal"
+    style="max-width:520px">
+
+    <h3>
+      <span class="ico" data-icon="descargar" aria-hidden="true"></span> Descargar reporte de Reservas
+    </h3>
+
+    <p class="ayuda">
+      El reporte se generará directamente desde el estado
+      actual de la base de datos.
+    </p>
+
+    <div class="campo">
+
+      <label>
+        Formato del archivo
+      </label>
+
+      <select id="formato-reporte-reservas">
+
+        <option value="xlsx">
+          Excel (.xlsx)
+        </option>
+
+        <option value="csv">
+          CSV (.csv)
+        </option>
+
+      </select>
+
+    </div>
+
+    <div
+      style="
+        display:flex;
+        justify-content:flex-end;
+        gap:10px;
+        margin-top:20px;
+      ">
+
+      <button
+        class="btn btn-ghost"
+        onclick="cerrarModalReporteReservas()">
+        Cancelar
+      </button>
+
+      <button
+        class="btn btn-azul"
+        onclick="descargarReporteReservas()">
+        <span class="ico" data-icon="descargar" aria-hidden="true"></span> Descargar
+      </button>
+
+    </div>
+  </div>
+</div>
+
+
+
+
+
+  <script src="interno/js/interno-supabase.js"></script>
+
+  <script src="public/js/legacy-products.js"></script>
+  <script src="interno/js/interno-repository.js"></script>
+
+  <script src="interno/js/table-loading.js"></script>
+  <script src="interno/js/interno-bandeja.js"></script>
+  <script src="interno/js/interno-gestion.js"></script>
+  <script src="interno/js/interno-sla.js"></script>
+
+  <script src="interno/js/interno-reservas.js"></script>
+
+  <script src="interno/js/interno-app.js"></script>
+  <script src="public/js/tour.js"></script>
+  <script src="interno/js/interno-tour.js"></script>
+
+  <script src="interno/js/interno-i18n.js"></script>
+  <script src="public/js/i18n.js"></script>
+
+</body>
+
+</html>

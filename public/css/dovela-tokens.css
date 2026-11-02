@@ -1,0 +1,167 @@
+/* ==========================================================================
+   Dovela Seguros — brand foundation (shared by the public and internal portals)
+   Load FIRST. Single source of truth for colour, type and font loading.
+   Contrast of every documented pairing is verified in docs/brand/contrast-report.md.
+   ========================================================================== */
+
+/* ---------- Self-hosted typefaces (SIL OFL 1.1, see public/assets/fonts/OFL-*.txt) ---------- */
+@font-face {
+  font-family: "Fraunces";
+  src: url("../assets/fonts/fraunces-latin-opsz-normal.woff2") format("woff2-variations"),
+       url("../assets/fonts/fraunces-latin-opsz-normal.woff2") format("woff2");
+  font-weight: 100 900; font-style: normal; font-display: swap;
+  unicode-range: U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6, U+02DA, U+02DC, U+0304, U+0308, U+0329, U+2000-206F, U+20AC, U+2122, U+2191, U+2193, U+2212, U+2215, U+FEFF, U+FFFD;
+}
+@font-face {
+  font-family: "Fraunces";
+  src: url("../assets/fonts/fraunces-latin-ext-opsz-normal.woff2") format("woff2");
+  font-weight: 100 900; font-style: normal; font-display: swap;
+  unicode-range: U+0100-02BA, U+02BD-02C5, U+02C7-02CC, U+02CE-02D7, U+02DD-02FF, U+0304, U+0308, U+0329, U+1D00-1DBF, U+1E00-1E9F, U+1EF2-1EFF, U+2020, U+20A0-20AB, U+20AD-20C0, U+2113, U+2C60-2C7F, U+A720-A7FF;
+}
+@font-face {
+  font-family: "Fraunces";
+  src: url("../assets/fonts/fraunces-latin-opsz-italic.woff2") format("woff2");
+  font-weight: 100 900; font-style: italic; font-display: swap;
+  unicode-range: U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6, U+02DA, U+02DC, U+0304, U+0308, U+0329, U+2000-206F, U+20AC, U+2122, U+2191, U+2193, U+2212, U+2215, U+FEFF, U+FFFD;
+}
+@font-face {
+  font-family: "Fraunces";
+  src: url("../assets/fonts/fraunces-latin-ext-opsz-italic.woff2") format("woff2");
+  font-weight: 100 900; font-style: italic; font-display: swap;
+  unicode-range: U+0100-02BA, U+02BD-02C5, U+02C7-02CC, U+02CE-02D7, U+02DD-02FF, U+0304, U+0308, U+0329, U+1D00-1DBF, U+1E00-1E9F, U+1EF2-1EFF, U+2020, U+20A0-20AB, U+20AD-20C0, U+2113, U+2C60-2C7F, U+A720-A7FF;
+}
+@font-face {
+  font-family: "Bricolage Grotesque";
+  src: url("../assets/fonts/bricolage-grotesque-latin-opsz-normal.woff2") format("woff2");
+  font-weight: 200 800; font-style: normal; font-display: swap;
+  unicode-range: U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6, U+02DA, U+02DC, U+0304, U+0308, U+0329, U+2000-206F, U+20AC, U+2122, U+2191, U+2193, U+2212, U+2215, U+FEFF, U+FFFD;
+}
+@font-face {
+  font-family: "Bricolage Grotesque";
+  src: url("../assets/fonts/bricolage-grotesque-latin-ext-opsz-normal.woff2") format("woff2");
+  font-weight: 200 800; font-style: normal; font-display: swap;
+  unicode-range: U+0100-02BA, U+02BD-02C5, U+02C7-02CC, U+02CE-02D7, U+02DD-02FF, U+0304, U+0308, U+0329, U+1D00-1DBF, U+1E00-1E9F, U+1EF2-1EFF, U+2020, U+20A0-20AB, U+20AD-20C0, U+2113, U+2C60-2C7F, U+A720-A7FF;
+}
+/* Metric-matched fallbacks keep layout stable while the web fonts swap in. */
+@font-face { font-family: "Fraunces Fallback"; src: local("Georgia"); size-adjust: 104%; ascent-override: 92%; descent-override: 24%; line-gap-override: 0%; }
+@font-face { font-family: "Bricolage Fallback"; src: local("Segoe UI"), local("Arial"); size-adjust: 99%; ascent-override: 94%; descent-override: 26%; line-gap-override: 0%; }
+
+:root {
+  color-scheme: dark;
+  /* Palette: DESIGN.md "PulsePoint" (dark base, navy, steel, alert hierarchy, glow elevation).
+     Contrast of every documented pairing: docs/brand/contrast-report.md. */
+
+  /* ---------- Corporate identity ---------- */
+  --brand-primary: #1E3A5F;          /* Primary Navy: primary containers, navigation, primary buttons */
+  --brand-primary-hover: #264A75;
+  --brand-primary-deep: #0A1222;     /* Deepest navy: hero base, footer, sidebar */
+  --brand-secondary: #60A5FA;        /* Interactive text on dark: links, focus, active labels (7.0:1 on base) */
+  --brand-tide: #3B82F6;             /* Info blue: indicators, selected borders, focus rings, glow (not body text on surface) */
+  --brand-tide-soft: #CBD5E1;        /* Text and lines on navy surfaces */
+  --brand-sage: #8D99AE;             /* Tertiary Steel: secondary text, inactive elements */
+  --brand-accent: #3B82F6;           /* Accent fill (CTA) with dark text 4.85:1; logo keystone */
+  --brand-accent-hover: #60A5FA;
+  --brand-accent-strong: #60A5FA;    /* Accent text on dark: eyebrows, emphasis */
+  --brand-accent-soft: rgb(59 130 246 / .15);
+
+  /* ---------- Text ---------- */
+  --text-primary: #F1F5F9;           /* 16.3:1 on base (AAA) */
+  --text-secondary: #CBD5E1;         /* 12.0:1 on base (AAA) */
+  --text-muted: #94A3B8;             /* 7.0:1 on base, 5.7:1 on surface */
+  --text-on-dark: #F1F5F9;
+  --text-on-dark-muted: #CBD5E1;
+  --text-on-accent: #0F172A;
+
+  /* ---------- Surfaces ---------- */
+  --surface-base: #0F172A;           /* Background */
+  --surface-raised: #152036;
+  --surface-elevated: #1E293B;       /* Surface: cards, panels, modals */
+  --surface-sunken: #0F172A;         /* Inputs inside cards */
+  --surface-tint: #172A45;           /* Navy-tinted panel */
+  --surface-translucent: rgb(30 41 59 / .62);
+  --surface-overlay: rgb(2 6 23 / .72);
+  --border-subtle: #334155;
+  --border-strong: #64748B;          /* Neutral Slate: control borders (3.75:1 on base), dividers, disabled */
+
+  /* ---------- Semantic / claim states (text-safe tones on dark; *-fill are the DESIGN.md hues) ---------- */
+  --success: #4ADE80;  --success-fill: #22C55E;  --success-soft: rgb(34 197 94 / .15);
+  --warning: #FBBF24;  --warning-fill: #F59E0B;  --warning-soft: rgb(245 158 11 / .15);
+  --error: #FF6B76;    --error-fill: #E63946;    --error-soft: rgb(230 57 70 / .15);
+  --info: #60A5FA;     --info-fill: #3B82F6;     --info-soft: rgb(59 130 246 / .15);
+  --pending: #CBD5E1;  --pending-fill: #8D99AE;  --pending-soft: rgb(141 153 174 / .16);
+  --claim-received: var(--info);
+  --claim-in-review: var(--pending);
+  --claim-needs-docs: var(--warning);
+  --claim-approved: var(--success);
+  --claim-declined: var(--error);
+  --claim-closed: var(--text-muted);
+
+  /* ---------- Elevation: glow-based (DESIGN.md). Shadows emit light rather than cast darkness. ---------- */
+  --elev-subtle: 0 1px 3px rgb(0 0 0 / .4), 0 0 8px rgb(30 58 95 / .15);
+  --elev-medium: 0 4px 12px rgb(0 0 0 / .5), 0 0 16px rgb(30 58 95 / .2);
+  --elev-large: 0 8px 24px rgb(0 0 0 / .6), 0 0 32px rgb(30 58 95 / .25);
+  --elev-overlay: 0 16px 48px rgb(0 0 0 / .7);
+  --elev-alert: 0 0 20px rgb(230 57 70 / .4), 0 0 6px rgb(230 57 70 / .6);
+  --glow-info: 0 0 0 1px rgb(59 130 246 / .4), 0 0 22px rgb(59 130 246 / .28);   /* informational elevation for interactive hover/focus */
+
+  /* ---------- Glass (kept from the product's expressive language, tuned for dark) ---------- */
+  --glass-fill: rgb(30 41 59 / .58);
+  --glass-edge: rgb(148 163 184 / .16);
+  --glass-highlight: inset 0 1px 0 rgb(255 255 255 / .06);
+
+  /* Channel triplets for translucent layers: rgb(var(--x-rgb) / alpha) */
+  --brand-primary-rgb: 30 58 95;
+  --brand-primary-deep-rgb: 10 18 34;
+  --brand-secondary-rgb: 59 130 246;
+  --brand-tide-rgb: 59 130 246;
+  --brand-sage-rgb: 141 153 174;
+  --brand-accent-rgb: 59 130 246;
+  --brand-accent-strong-rgb: 96 165 250;
+  --surface-tint-rgb: 23 42 69;
+  --surface-rgb: 30 41 59;
+  --warning-rgb: 245 158 11;
+  --error-rgb: 230 57 70;
+
+  /* ---------- Typography ---------- */
+  --font-display: "Fraunces", "Fraunces Fallback", "Iowan Old Style", Georgia, serif;
+  --font-ui: "Bricolage Grotesque", "Bricolage Fallback", "Segoe UI", system-ui, sans-serif;
+  --font-body: var(--font-ui);
+  --measure: 68ch;
+
+  /* Fluid type scale (rem-based so it follows browser zoom and the wide-screen rem steps) */
+  --type-display-xl: clamp(2.75rem, 1.6rem + 4.6vw, 5.25rem);
+  --type-display-l: clamp(2.25rem, 1.5rem + 3vw, 3.75rem);
+  --type-h1: clamp(2rem, 1.45rem + 2.3vw, 3.15rem);
+  --type-h2: clamp(1.6rem, 1.25rem + 1.5vw, 2.35rem);
+  --type-h3: clamp(1.28rem, 1.12rem + .7vw, 1.6rem);
+  --type-h4: clamp(1.1rem, 1.02rem + .35vw, 1.25rem);
+  --type-body-l: clamp(1.06rem, 1rem + .3vw, 1.22rem);
+  --type-body: 1rem;
+  --type-body-s: .9rem;
+  --type-label: .875rem;
+  --type-caption: .8rem;
+  --type-overline: .76rem;
+
+  /* ---------- Legacy aliases (existing component API; prefer the semantic names above) ---------- */
+  --azul: var(--brand-tide);
+  --azul-osc: var(--brand-secondary);
+  --verde: var(--brand-accent);
+  --verde-osc: var(--brand-accent-strong);
+  --profundo: var(--brand-primary);
+  --tinta: var(--text-primary);
+  --grafito: var(--text-secondary);
+  --pizarra: var(--text-muted);
+  --bruma: var(--surface-base);
+  --niebla: var(--surface-sunken);
+  --blanco: var(--surface-elevated);
+  --rojo: var(--error);
+  --ambar: var(--warning);
+  --serif: var(--font-display);
+  --sans: var(--font-ui);
+  --mono: var(--font-ui);
+}
+
+/* Ink-trap sans: the opsz axis follows font size, so small UI text gets the trapped cut. */
+body { font-optical-sizing: auto; font-kerning: normal; }
+/* Claim codes and numbers: tabular figures for scanning and comparison. */
+:where(.num, .codigo, code, kbd, .kpi .n, td.num, [data-numeric]) { font-variant-numeric: tabular-nums; }

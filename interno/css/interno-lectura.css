@@ -1,0 +1,158 @@
+/* ================= MODO LECTURA (portal interno) =================
+   Protección visual: menos luz azul y menos deslumbramiento, para modo claro y oscuro.
+   - Superficies y texto: grises cálidos (papel de día, carbón de noche); el contraste del texto
+     baja de ~17:1 a ~13:1 (sigue por encima de AAA 7:1) para reducir el brillo.
+   - Colores corporativos: misma tonalidad, saturación −10/−16 puntos y luz ±4 puntos como máximo;
+     ningún canal RGB cambia más del 8 % (tolerancia pedida: 20 %).
+   - Semánticos (éxito, alerta, error) y el azul profundo de la marca se conservan.
+   Se activa con html[data-reading="on"] (interno/js/interno-lectura.js). */
+
+/* ---------- Claro ---------- */
+html[data-theme="light"][data-reading="on"] {
+  --brand-primary: #243B59;
+  --brand-primary-hover: #2E4B6D;
+  --brand-secondary: #3157C4;
+  --brand-tide: #386AD8;
+  --brand-accent: #386AD8;
+  --brand-accent-hover: #3157C4;
+  --brand-accent-strong: #3157C4;
+  --brand-accent-soft: rgb(56 106 216 / .10);
+  --info: #3157C4;
+
+  --text-primary: #2B2824;
+  --text-secondary: #48433C;
+  --text-muted: #5E584F;
+
+  --surface-base: #F4F1EA;
+  --surface-raised: #FAF8F3;
+  --surface-elevated: #FAF8F3;
+  --surface-sunken: #ECE8DF;
+  --surface-tint: #ECE8DE;
+  --surface-translucent: rgb(250 248 243 / .82);
+  --border-subtle: #D6D0C4;
+  --border-strong: #A29A8C;
+
+  --glass-fill: rgb(250 248 243 / .86);
+  --glass-edge: rgb(72 67 60 / .14);
+  --glass-highlight: inset 0 1px 0 rgb(255 253 248 / .9);
+  --glow-info: 0 0 0 3px rgb(56 106 216 / .14);
+
+  --brand-primary-rgb: 36 59 89;
+  --brand-secondary-rgb: 49 87 196;
+  --brand-tide-rgb: 56 106 216;
+  --brand-accent-rgb: 56 106 216;
+  --brand-accent-strong-rgb: 49 87 196;
+  --surface-tint-rgb: 236 232 222;
+  --surface-rgb: 250 248 243;
+}
+
+/* ---------- Oscuro ---------- */
+html[data-reading="on"]:not([data-theme="light"]) {
+  --brand-primary: #243B59;
+  --brand-primary-hover: #2E4B6D;
+  --brand-secondary: #5B9BEB;
+  --brand-tide: #4280E4;
+  --brand-accent: #4280E4;
+  --brand-accent-hover: #5B9BEB;
+  --brand-accent-strong: #5B9BEB;
+  --brand-accent-soft: rgb(66 128 228 / .15);
+  --info: #5B9BEB;
+
+  --text-primary: #E6E0D4;
+  --text-secondary: #CBC4B6;
+  --text-muted: #A39C8F;
+  --text-on-dark: #E6E0D4;
+  --text-on-dark-muted: #CBC4B6;
+  --text-on-accent: #1B1A18;
+
+  --surface-base: #1B1A18;
+  --surface-raised: #22211E;
+  --surface-elevated: #2A2825;
+  --surface-sunken: #171614;
+  --surface-tint: #26282A;
+  --surface-translucent: rgb(42 40 37 / .62);
+  --border-subtle: #3D3A35;
+  --border-strong: #6E685E;
+
+  --glass-fill: rgb(42 40 37 / .6);
+  --glass-edge: rgb(203 196 182 / .14);
+  --glow-info: 0 0 0 1px rgb(66 128 228 / .35), 0 0 18px rgb(66 128 228 / .2);
+
+  --brand-primary-rgb: 36 59 89;
+  --brand-secondary-rgb: 91 155 235;
+  --brand-tide-rgb: 66 128 228;
+  --brand-accent-rgb: 66 128 228;
+  --brand-accent-strong-rgb: 91 155 235;
+  --surface-tint-rgb: 38 40 42;
+  --surface-rgb: 42 40 37;
+}
+
+/* Filtro cálido muy suave sobre toda la página: atenúa el azul también en imágenes, íconos y
+   colores fijos que no usan variables. Multiplica por (1, .98, .95) en claro: −5 % de azul. */
+html[data-reading="on"] body::after {
+  content: "";
+  position: fixed;
+  inset: 0;
+  z-index: 2147483000;
+  background: rgb(255 170 60 / .06);
+  mix-blend-mode: multiply;
+  pointer-events: none;
+}
+html[data-reading="on"]:not([data-theme="light"]) body::after { background: rgb(255 160 50 / .05); }
+
+/* ---------- Botón con ícono de ojo (junto al idioma y al interruptor claro/oscuro) ----------
+   Mismo tamaño que esos controles (--ctl-ancho × --ctl-alto) y mismo comportamiento expresivo:
+   vidrio, elevación al pasar el cursor, compresión al pulsar y anillo de foco vienen de las reglas
+   compartidas de public/css/theme.css, donde .btn-lectura está en la misma lista que el idioma. */
+.theme-switch-slot { display: flex; align-items: center; gap: 8px; }
+.btn-lectura {
+  position: relative;
+  display: inline-grid;
+  place-items: center;
+  flex: none;
+  box-sizing: border-box;
+  width: var(--ctl-ancho, 80px);
+  height: var(--ctl-alto, 40px);
+  min-height: var(--ctl-alto, 40px);
+  padding: 0;
+  border-width: 1px;
+  border-style: solid;
+  border-radius: 999px;
+  color: var(--text-on-dark, #F1F5F9);
+  font: inherit;
+  cursor: pointer;
+}
+.btn-lectura svg {
+  position: relative;
+  z-index: 1;
+  width: 19px;
+  height: 19px;
+  fill: none;
+  stroke: currentColor;
+  stroke-width: 1.8;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+  pointer-events: none;
+}
+/* Activo: el mismo vidrio, teñido de ámbar (tono cálido de protección visual). */
+:is(.marca-side, .login-panel) .btn-lectura[aria-pressed="true"] {
+  border-color: rgb(251 191 36 / .7);
+  background:
+    radial-gradient(circle at 12% -35%, rgb(255 255 255 / .28), transparent 52%),
+    linear-gradient(135deg, rgb(245 158 11 / .34), rgb(245 158 11 / .14));
+  background-size: 170% 170%, 100% 100%;
+  color: #FCD34D;
+}
+html[data-theme="light"] :is(#v-landing, .login-panel) .btn-lectura[aria-pressed="true"] {
+  border-color: rgb(180 83 9 / .45);
+  background:
+    radial-gradient(circle at 12% -35%, rgb(255 255 255 / .95), transparent 54%),
+    linear-gradient(135deg, rgb(254 243 199 / .95), rgb(253 230 138 / .6));
+  background-size: 170% 170%, 100% 100%;
+  color: #92400E;
+}
+@media (forced-colors: active) {
+  html[data-reading="on"] body::after { display: none; }
+  .btn-lectura { border: 2px solid ButtonText; }
+  .btn-lectura[aria-pressed="true"] { outline: 2px solid Highlight; }
+}

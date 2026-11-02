@@ -1,0 +1,570 @@
+/* ==========================================================================
+   Featured card: rotating inner glow ("Presentar un reclamo")
+   Gemini-style conic glow rendered as pop-art pointillism (halftone dots),
+   in DESIGN.md hues (Info blue, Success green, Warning amber; red stays reserved).
+
+   Markup (index.html):
+     <span class="featured-glow" aria-hidden="true"><span class="featured-glow__dots"></span></span>
+   - .featured-glow        static frame: clips to the card radius and masks to a narrow
+                           18px inner band, so the glow hugs the edge and content stays clean.
+   - .featured-glow__dots  oversized layer carrying the conic colours AND the dot matrix;
+                           it rotates, so the halftone turns together with the glow.
+   - ::after               thin edge ring in the same colours.
+   One animated angle (--glow-spin, inherited) drives the dots and the ring in sync.
+   M3 Expressive: every layer inherits border-radius, so the pressed shape-morph and spring
+   scale from m3-expressive.css apply to the glow too. Reduced motion: no rotation.
+   ========================================================================== */
+@property --glow-spin {
+  syntax: "<angle>";
+  inherits: true;
+  initial-value: 0deg;
+}
+
+@property --dev-glow-spin {
+  syntax: "<angle>";
+  inherits: true;
+  initial-value: 0deg;
+}
+
+#v-landing .cards-acceso > .card-acc:first-child {
+  isolation: isolate;
+  animation: featured-glow-spin 9s linear infinite;
+}
+#v-landing .cards-acceso > .card-acc:first-child > * { position: relative; z-index: 1; }
+#v-landing .cards-acceso > .card-acc:first-child::before { content: none; }
+
+/* Static frame: union of four 18px edge fades, clipped to the card shape. */
+#v-landing .cards-acceso > .card-acc:first-child > .featured-glow {
+  position: absolute;
+  inset: 0;
+  z-index: 0;
+  border-radius: inherit;
+  overflow: hidden;
+  pointer-events: none;
+  opacity: .75;
+  -webkit-mask:
+    linear-gradient(to bottom, #000, transparent 18px),
+    linear-gradient(to top, #000, transparent 18px),
+    linear-gradient(to right, #000, transparent 18px),
+    linear-gradient(to left, #000, transparent 18px);
+  -webkit-mask-composite: source-over;
+          mask:
+    linear-gradient(to bottom, #000, transparent 18px),
+    linear-gradient(to top, #000, transparent 18px),
+    linear-gradient(to right, #000, transparent 18px),
+    linear-gradient(to left, #000, transparent 18px);
+          mask-composite: add;
+  transition: opacity var(--m3-dur-effects, 180ms) var(--m3-effects, ease);
+}
+
+/* Rotating layer: conic colours + dense halftone (≈2px dots on a 4px grid) turn together.
+   Oversized (inset -60%) so the rotated square always covers the card corners. */
+#v-landing .cards-acceso > .card-acc:first-child > .featured-glow > .featured-glow__dots {
+  position: absolute;
+  inset: -60%;
+  background: conic-gradient(from 0deg,
+    #3B82F6 0deg, #60A5FA 50deg, #22C55E 120deg, #4ADE80 160deg,
+    #F59E0B 230deg, #FBBF24 270deg, #3B82F6 360deg);
+  -webkit-mask: radial-gradient(circle at center, #000 .95px, transparent 1.35px) 0 0 / 4px 4px;
+          mask: radial-gradient(circle at center, #000 .95px, transparent 1.35px) 0 0 / 4px 4px;
+  transform: rotate(var(--glow-spin));
+}
+
+/* Edge ring: the same colours clipped to a 1.5px border, following the same angle. */
+#v-landing .cards-acceso > .card-acc:first-child::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  z-index: 0;
+  border-radius: inherit;
+  pointer-events: none;
+  padding: 1.5px;
+  opacity: .8;
+  background: conic-gradient(from var(--glow-spin),
+    #3B82F6 0deg, #60A5FA 50deg, #22C55E 120deg, #4ADE80 160deg,
+    #F59E0B 230deg, #FBBF24 270deg, #3B82F6 360deg);
+  -webkit-mask: linear-gradient(#000 0 0) content-box, linear-gradient(#000 0 0);
+  -webkit-mask-composite: xor;
+          mask: linear-gradient(#000 0 0) content-box, linear-gradient(#000 0 0);
+          mask-composite: exclude;
+  filter: drop-shadow(0 0 5px rgb(59 130 246 / .4));
+}
+
+@media (hover: hover) and (pointer: fine) {
+  #v-landing .cards-acceso > .card-acc:first-child:hover > .featured-glow { opacity: .95; }
+}
+#v-landing .cards-acceso > .card-acc:first-child:focus-visible > .featured-glow { opacity: .95; }
+
+@keyframes featured-glow-spin { to { --glow-spin: 360deg; } }
+
+@media (prefers-reduced-motion: reduce) {
+  #v-landing .cards-acceso > .card-acc:first-child { animation: none; }
+}
+
+/* ========================================================================== 
+   Developer tag: the featured card's pointillist spectrum moved outside the
+   control. Hover reveals it, press makes it chromatically elastic, and the
+   user can lock the aurora into an active orbit.
+   ========================================================================== */
+.gishiko-footer { padding: 12px 8px 30px; }
+.gishiko-footer .footer__brand { margin-top: clamp(26px, 2.4vw, 34px); }
+
+.footer__devtag {
+  position: relative;
+  isolation: isolate;
+  display: inline-grid;
+  place-items: center;
+  min-height: 42px;
+  padding: 10px 18px;
+  border: 1px solid rgb(148 163 184 / .2);
+  border-radius: 14px;
+  appearance: none;
+  background: linear-gradient(145deg, rgb(30 58 95 / .34), rgb(15 23 42 / .48));
+  color: var(--text-muted);
+  font: inherit;
+  cursor: pointer;
+  -webkit-tap-highlight-color: transparent;
+  transform: translateZ(0);
+  transform-origin: center;
+  box-shadow: inset 0 1px 0 rgb(255 255 255 / .07);
+  transition:
+    transform 620ms cubic-bezier(.18, 1.55, .32, 1),
+    border-radius 520ms cubic-bezier(.18, 1.35, .32, 1),
+    border-color 240ms ease,
+    color 240ms ease,
+    background-color 240ms ease,
+    box-shadow 360ms ease,
+    filter 420ms cubic-bezier(.2, .8, .2, 1);
+}
+
+.gishiko-footer.is-dev-active { opacity: 1; }
+
+.footer__devtag .footer__logo {
+  position: relative;
+  z-index: 2;
+  display: block;
+  font-style: italic;
+  font-weight: 650;
+  letter-spacing: .025em;
+  transition: color 260ms ease, filter 360ms ease;
+}
+
+/* Seven pixels of breathing room keep the animated band outside the button. */
+.footer__dev-glow {
+  position: absolute;
+  z-index: 0;
+  inset: -11px;
+  overflow: hidden;
+  padding: 7px;
+  border-radius: 21px;
+  pointer-events: none;
+  opacity: 0;
+  filter: drop-shadow(0 0 7px rgb(59 130 246 / .35));
+  -webkit-mask: linear-gradient(#000 0 0) content-box, linear-gradient(#000 0 0);
+  -webkit-mask-composite: xor;
+          mask: linear-gradient(#000 0 0) content-box, linear-gradient(#000 0 0);
+          mask-composite: exclude;
+  transition:
+    opacity 320ms ease,
+    inset 620ms cubic-bezier(.18, 1.55, .32, 1),
+    border-radius 520ms cubic-bezier(.18, 1.35, .32, 1),
+    filter 360ms ease;
+}
+
+.footer__dev-glow-dots {
+  position: absolute;
+  inset: 0;
+  display: block;
+  background: conic-gradient(from var(--dev-glow-spin),
+    #3B82F6 0deg, #60A5FA 50deg, #22C55E 120deg, #4ADE80 160deg,
+    #F59E0B 230deg, #FBBF24 270deg, #3B82F6 360deg);
+  -webkit-mask: radial-gradient(circle at center, #000 .95px, transparent 1.35px) 0 0 / 4px 4px;
+          mask: radial-gradient(circle at center, #000 .95px, transparent 1.35px) 0 0 / 4px 4px;
+  transition: filter 320ms ease;
+}
+
+.footer__devtag::after {
+  content: "";
+  width: 12px;
+  height: 12px;
+  background: currentColor;
+  -webkit-mask: url("data:image/svg+xml,%3Csvg xmlns=%27http://www.w3.org/2000/svg%27 viewBox=%270 0 24 24%27%3E%3Cpath d=%27M12 2l2.2 7.8L22 12l-7.8 2.2L12 22l-2.2-7.8L2 12l7.8-2.2z%27/%3E%3C/svg%3E") center / contain no-repeat;
+          mask: url("data:image/svg+xml,%3Csvg xmlns=%27http://www.w3.org/2000/svg%27 viewBox=%270 0 24 24%27%3E%3Cpath d=%27M12 2l2.2 7.8L22 12l-7.8 2.2L12 22l-2.2-7.8L2 12l7.8-2.2z%27/%3E%3C/svg%3E") center / contain no-repeat;
+  position: absolute;
+  z-index: 3;
+  top: -12px;
+  right: -9px;
+  color: #FBBF24;
+  font-size: 12px;
+  line-height: 1;
+  opacity: 0;
+  filter: drop-shadow(0 0 5px rgb(251 191 36 / .8));
+  transform: scale(.25) rotate(-40deg);
+  transition: opacity 240ms ease, transform 620ms cubic-bezier(.18, 1.7, .32, 1);
+}
+
+.footer__devtag:hover {
+  color: #E2E8F0;
+  border-color: rgb(96 165 250 / .5);
+  transform: translateY(-2px) scale(1.025);
+  box-shadow:
+    inset 0 1px 0 rgb(255 255 255 / .12),
+    0 8px 24px rgb(15 23 42 / .35);
+}
+.footer__devtag:hover .footer__dev-glow { opacity: .88; }
+.footer__devtag:hover .footer__dev-glow-dots { animation: devtag-glow-spin 5.8s linear infinite; }
+
+.footer__devtag:focus-visible {
+  outline: 3px solid #60A5FA;
+  outline-offset: 7px;
+  color: #F8FAFC;
+}
+.footer__devtag:focus-visible .footer__dev-glow { opacity: .92; }
+
+/* Active is a toggleable aurora lock: a quiet, persistent spectral signature. */
+.footer__devtag[aria-pressed="true"] {
+  color: #F8FAFC;
+  border-color: rgb(74 222 128 / .48);
+  transform: translateY(-1px);
+  box-shadow:
+    inset 0 1px 0 rgb(255 255 255 / .14),
+    0 0 20px rgb(59 130 246 / .16),
+    0 0 34px rgb(34 197 94 / .1);
+}
+.footer__devtag[aria-pressed="true"] .footer__dev-glow {
+  inset: -13px;
+  opacity: 1;
+  filter:
+    drop-shadow(0 0 7px rgb(59 130 246 / .52))
+    drop-shadow(0 0 12px rgb(34 197 94 / .22));
+}
+.footer__devtag[aria-pressed="true"] .footer__dev-glow-dots {
+  animation: devtag-glow-spin 4.6s linear infinite;
+}
+.footer__devtag[aria-pressed="true"] .footer__logo {
+  color: transparent;
+  background: linear-gradient(100deg, #60A5FA, #4ADE80 46%, #FBBF24 72%, #60A5FA);
+  background-size: 220% 100%;
+  background-clip: text;
+  -webkit-background-clip: text;
+  animation: devtag-text-spectrum 3.2s ease-in-out infinite alternate;
+  filter: drop-shadow(0 0 6px rgb(96 165 250 / .25));
+}
+.footer__devtag[aria-pressed="true"]::after {
+  opacity: 1;
+  transform: scale(1) rotate(0deg);
+  animation: devtag-spark 1.8s ease-in-out infinite alternate;
+}
+
+/* Press compresses the tag like a soft prism, then the spring transition releases it. */
+.footer__devtag:active {
+  border-radius: 9px 18px 10px 17px / 14px 9px 18px 11px;
+  transform: translateY(2px) scaleX(1.09) scaleY(.82) rotate(-1.2deg);
+  filter: hue-rotate(32deg) saturate(1.42);
+  transition-duration: 90ms;
+}
+.footer__devtag:active .footer__dev-glow {
+  inset: -8px -15px;
+  border-radius: 13px 26px 14px 24px / 22px 13px 27px 15px;
+  opacity: 1;
+  filter:
+    hue-rotate(42deg) saturate(1.7)
+    drop-shadow(0 0 10px rgb(59 130 246 / .7));
+  transition-duration: 90ms;
+}
+.footer__devtag:active .footer__dev-glow-dots { animation-duration: .8s; }
+
+@keyframes devtag-glow-spin { to { --dev-glow-spin: 360deg; } }
+@keyframes devtag-text-spectrum {
+  from { background-position: 0 50%; }
+  to { background-position: 100% 50%; }
+}
+@keyframes devtag-spark {
+  from { transform: scale(.82) rotate(-9deg); opacity: .62; }
+  to { transform: scale(1.14) rotate(9deg); opacity: 1; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .footer__devtag,
+  .footer__dev-glow,
+  .footer__devtag .footer__logo,
+  .footer__devtag::after {
+    animation: none !important;
+    transition-duration: .01ms !important;
+  }
+  .footer__devtag:active { transform: none; }
+  .footer__dev-glow-dots { animation: none !important; }
+}
+
+/* ========================================================================== 
+   Developer link v2: a compact signature with a continuous spectral halo.
+   This cascade intentionally replaces the former toggle/card presentation.
+   ========================================================================== */
+.gishiko-footer {
+  padding: 4px 8px 12px;
+  opacity: 1;
+  transition: none;
+}
+.gishiko-footer .footer__brand { margin-top: 6px; }
+
+.footer__devtag,
+.footer__devtag:visited {
+  --devtag-radius: 10px;
+  --devtag-glow-gap: 4px;
+  position: relative;
+  isolation: isolate;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  min-height: 44px;
+  max-width: calc(100vw - 32px);
+  padding: 4px 10px;
+  border: 0;
+  border-radius: var(--devtag-radius);
+  appearance: none;
+  background: transparent;
+  color: #CBD5E1;
+  box-shadow: none;
+  font: inherit;
+  text-decoration: none;
+  cursor: pointer;
+  -webkit-tap-highlight-color: transparent;
+  transform: translateZ(0);
+  transform-origin: center;
+  transition:
+    transform 580ms cubic-bezier(.16, 1.56, .3, 1),
+    color 240ms cubic-bezier(.4, 0, .2, 1),
+    filter 420ms cubic-bezier(.2, .8, .2, 1);
+}
+html[data-theme="light"] .footer__devtag,
+html[data-theme="light"] .footer__devtag:visited { color: #334155; }
+
+.footer__devtag::before {
+  content: "";
+  position: absolute;
+  z-index: -2;
+  top: 50%;
+  right: -8px;
+  left: -8px;
+  height: 36px;
+  border-radius: calc(var(--devtag-radius) + var(--devtag-glow-gap) + 2px);
+  background: conic-gradient(from var(--dev-glow-spin),
+    rgb(37 99 235 / .54), rgb(6 182 212 / .5), rgb(139 92 246 / .46),
+    rgb(217 70 239 / .42), rgb(244 63 94 / .42), rgb(245 158 11 / .48),
+    rgb(132 204 22 / .42), rgb(16 185 129 / .5), rgb(37 99 235 / .54));
+  opacity: .15;
+  filter: blur(10px);
+  transform: translateY(-50%);
+  animation: devtag-glow-spin 16s linear infinite;
+  pointer-events: none;
+  transition: opacity 260ms ease, filter 420ms cubic-bezier(.2, .8, .2, 1);
+}
+.footer__devtag::after {
+  content: none;
+}
+.footer__dev-ripples {
+  position: absolute;
+  z-index: 1;
+  top: 50%;
+  right: 4px;
+  left: 4px;
+  height: 24px;
+  display: block;
+  overflow: hidden;
+  border-radius: max(6px, calc(var(--devtag-radius) - 4px));
+  -webkit-clip-path: inset(0 round max(6px, calc(var(--devtag-radius) - 4px)));
+          clip-path: inset(0 round max(6px, calc(var(--devtag-radius) - 4px)));
+  contain: paint;
+  pointer-events: none;
+  transform: translateY(-50%);
+}
+.footer__dev-ripples::before {
+  content: "";
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  width: 88px;
+  height: 88px;
+  border-radius: 50%;
+  background: repeating-radial-gradient(circle,
+    transparent 0 8px,
+    rgb(96 165 250 / .74) 8.2px 9.4px,
+    transparent 9.8px 16px,
+    rgb(192 132 252 / .66) 16.2px 17.35px,
+    transparent 17.75px 24px,
+    rgb(52 211 153 / .62) 24.2px 25.3px,
+    transparent 25.7px 32px,
+    rgb(251 191 36 / .58) 32.2px 33.25px,
+    transparent 33.65px);
+  opacity: 0;
+  pointer-events: none;
+  transform: translate(-50%, -50%) scale(.28);
+  transform-origin: center;
+}
+html[data-theme="light"] .footer__dev-ripples::before {
+  background: repeating-radial-gradient(circle,
+    transparent 0 8px,
+    rgb(29 78 216 / .68) 8.2px 9.4px,
+    transparent 9.8px 16px,
+    rgb(126 34 206 / .58) 16.2px 17.35px,
+    transparent 17.75px 24px,
+    rgb(5 150 105 / .56) 24.2px 25.3px,
+    transparent 25.7px 32px,
+    rgb(180 83 9 / .52) 32.2px 33.25px,
+    transparent 33.65px);
+}
+
+.footer__devtag .footer__logo {
+  position: relative;
+  z-index: 2;
+  display: block;
+  min-width: 0;
+  color: inherit;
+  background: none;
+  filter: none;
+  font-style: italic;
+  font-weight: 700;
+  letter-spacing: .035em;
+  animation: none;
+  transition: color 240ms ease, filter 360ms ease, letter-spacing 520ms cubic-bezier(.16, 1.4, .3, 1);
+}
+.footer__dev-icon {
+  position: relative;
+  z-index: 2;
+  width: 16px;
+  height: 16px;
+  flex: 0 0 auto;
+  transition: transform 560ms cubic-bezier(.16, 1.56, .3, 1), color 240ms ease;
+}
+
+/* Radius + exterior gap keeps both corner curves mathematically concentric. */
+.footer__dev-glow {
+  position: absolute;
+  z-index: 0;
+  top: 50%;
+  bottom: auto;
+  right: -4px;
+  left: -4px;
+  height: 30px;
+  overflow: hidden;
+  padding: 1.5px;
+  border-radius: calc(var(--devtag-radius) + var(--devtag-glow-gap));
+  background: conic-gradient(from var(--dev-glow-spin),
+    #2563EB 0deg, #06B6D4 46deg, #8B5CF6 92deg, #D946EF 138deg,
+    #F43F5E 184deg, #F59E0B 230deg, #84CC16 274deg,
+    #10B981 318deg, #2563EB 360deg);
+  pointer-events: none;
+  opacity: .5;
+  filter:
+    drop-shadow(0 0 4px rgb(59 130 246 / .3))
+    drop-shadow(0 0 8px rgb(139 92 246 / .12));
+  transform: translateY(-50%);
+  -webkit-mask: linear-gradient(#000 0 0) content-box, linear-gradient(#000 0 0);
+  -webkit-mask-composite: xor;
+          mask: linear-gradient(#000 0 0) content-box, linear-gradient(#000 0 0);
+          mask-composite: exclude;
+  transition:
+    opacity 260ms ease,
+    right 560ms cubic-bezier(.16, 1.42, .3, 1),
+    left 560ms cubic-bezier(.16, 1.42, .3, 1),
+    height 560ms cubic-bezier(.16, 1.42, .3, 1),
+    border-radius 580ms cubic-bezier(.16, 1.56, .3, 1),
+    filter 360ms ease;
+  animation: devtag-glow-spin 12s linear infinite;
+}
+
+@media (hover: hover) and (pointer: fine) {
+  .footer__devtag:hover {
+    color: #F8FAFC;
+    border-color: transparent;
+    background: transparent;
+    box-shadow: none;
+    transform: none;
+    filter: none;
+  }
+  html[data-theme="light"] .footer__devtag:hover { color: #0F2A4D; }
+  .footer__devtag:hover::before { opacity: .23; filter: blur(11px) saturate(1.1); animation-duration: 8s; }
+  .footer__devtag:hover .footer__dev-glow {
+    opacity: .78;
+    filter:
+      drop-shadow(0 0 5px rgb(59 130 246 / .34))
+      drop-shadow(0 0 8px rgb(217 70 239 / .12));
+    animation-duration: 7s;
+  }
+  .footer__devtag:hover .footer__dev-ripples::before { animation: devtag-ripple-hover 1.8s cubic-bezier(.45, 0, .2, 1) infinite; }
+  .footer__devtag:hover .footer__dev-icon { transform: none; }
+}
+
+.footer__devtag:focus-visible {
+  outline: 3px solid #60A5FA;
+  outline-offset: 7px;
+  color: #F8FAFC;
+}
+html[data-theme="light"] .footer__devtag:focus-visible { color: #0F2A4D; }
+.footer__devtag:focus-visible::before { opacity: .22; }
+.footer__devtag:focus-visible .footer__dev-glow { opacity: .8; }
+
+/* Press: a small droplet impact; concentric waves remain visible on hover. */
+.footer__devtag:active {
+  --devtag-radius: 10px;
+  border-radius: var(--devtag-radius);
+  background: transparent;
+  box-shadow: none;
+  transform: translateY(1px) scale(.975);
+  filter: hue-rotate(12deg) saturate(1.12);
+  /* The impact is immediate; the animated waves belong to release. */
+  transition: color 55ms cubic-bezier(.4, 0, 1, 1), filter 55ms cubic-bezier(.4, 0, 1, 1);
+}
+.footer__devtag:active::before { opacity: .24; filter: blur(9px) saturate(1.14); }
+.footer__devtag:active .footer__dev-ripples::before {
+  opacity: .34;
+  transform: translate(-50%, -50%) scale(.42);
+}
+.footer__devtag:active .footer__dev-glow {
+  top: 50%;
+  bottom: auto;
+  right: -3px;
+  left: -3px;
+  height: 31px;
+  border-radius: 13px 15px 12px 14px / 14px 12px 15px 13px;
+  opacity: .82;
+  filter:
+    hue-rotate(18deg) saturate(1.18)
+    drop-shadow(0 0 6px rgb(139 92 246 / .32));
+  transform: translateY(-50%);
+  transition-duration: 55ms;
+  animation-duration: 1.6s;
+}
+.footer__devtag:active .footer__dev-icon { transform: translate(1px, -1px) rotate(2deg); }
+
+@keyframes devtag-ripple-hover {
+  0% { opacity: 0; transform: translate(-50%, -50%) scale(.52); filter: blur(0); }
+  30% { opacity: .68; }
+  72% { opacity: .28; }
+  100% { opacity: 0; transform: translate(-50%, -50%) scale(1.52); filter: blur(.3px); }
+}
+
+@media (max-width: 420px) {
+  .footer__devtag { padding-inline: 9px; }
+}
+@media (prefers-reduced-motion: reduce) {
+  .footer__devtag,
+  .footer__devtag::before,
+  .footer__dev-ripples::before,
+  .footer__dev-glow,
+  .footer__dev-icon {
+    animation: none !important;
+    transition-duration: .01ms !important;
+  }
+  .footer__devtag:active { transform: none; }
+  .footer__devtag:hover .footer__dev-ripples::before {
+    opacity: .34;
+    transform: translate(-50%, -50%) scale(.95);
+  }
+}
+@media (forced-colors: active) {
+  .footer__devtag { color: LinkText; outline-offset: 5px; }
+  .footer__devtag::before,
+  .footer__dev-glow { display: none; }
+}
