@@ -3750,10 +3750,13 @@ document.addEventListener('dovela:languagechange', () => {
 /* Devtag en pantallas táctiles: sin hover, el efecto Expressive (trazo 1.5→3px + ondas) se
    muestra con la clase .is-showcase (public/css/featured-glow.css):
    1) una vez al llegar al pie (vitrina, ≥ 8 s entre repeticiones, nunca en bucle);
-   2) al tocar: el efecto arranca bajo el dedo y el enlace se abre tras una pausa breve (650 ms)
-      para que se alcance a ver. Un solo toque basta. La reapertura repite el clic sobre el mismo
-      enlace, así conserva target="_blank" y rel="me noopener noreferrer"; 650 ms queda dentro del
-      margen de gesto de iOS Safari (~1 s), por lo que la pestaña nueva no se bloquea.
+   2) al tocar: el efecto arranca bajo el dedo y el enlace se abre tras una pausa (800 ms) para
+      que se alcance a ver completo. Un solo toque basta. La reapertura repite el clic sobre el
+      mismo enlace, así conserva target="_blank" y rel="me noopener noreferrer".
+      Tolerancias de apertura de pestaña tras un gesto: Chrome/Edge/Samsung Internet/Opera (y
+      Android WebView) ≈ 5 s; Firefox ≈ 5 s; Safari en iOS/iPadOS/macOS —y todo navegador en iOS,
+      que usa WebKit— ≈ 1 s. El límite común es el de WebKit: 800 ms deja ~200 ms de margen para
+      el retraso de temporizadores en equipos lentos o en ahorro de batería.
    Mouse, teclado y clics con modificadores no cambian: abren al instante. */
 (function initDevtagShowcase() {
   const link = document.querySelector('[data-devtag-link]');
@@ -3763,6 +3766,7 @@ document.addEventListener('dovela:languagechange', () => {
   const DURACION_VITRINA = 2400;
   const PAUSA_VITRINA = 8000;
   const VENTANA_TOQUE = 800;
+  const PAUSA_APERTURA = 800; // margen holgado bajo el límite de WebKit (iOS); ver nota arriba
   let ocultarTimer = 0;
   let abrirTimer = 0;
   let ultimaVitrina = -Infinity;
@@ -3827,7 +3831,7 @@ document.addEventListener('dovela:languagechange', () => {
         document.removeEventListener('visibilitychange', marcarSalida);
         if (!salio && document.visibilityState === 'visible' && document.hasFocus()) window.location.assign(link.href);
       }, 600);
-    }, reducedMotion.matches ? 250 : 650);
+    }, reducedMotion.matches ? 250 : PAUSA_APERTURA);
   }, true);
 
   // Al volver de Linktree el efecto no queda pegado.
