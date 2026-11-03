@@ -8461,7 +8461,7 @@ function pintarBanners() {
       <td><div class="cms-orden"><b>${i + 1}</b>
         <button class="btn btn-ghost btn-sm" onclick="moverBanner('${esc(b.id)}',-1)" ${i === 0 ? "disabled" : ""} aria-label="Subir" title="Subir">↑</button>
         <button class="btn btn-ghost btn-sm" onclick="moverBanner('${esc(b.id)}',1)" ${i === ultimo ? "disabled" : ""} aria-label="Bajar" title="Bajar">↓</button></div></td>
-      <td><b data-i18n-ignore>${esc(b.titulo)}</b><div class="ayuda" style="margin:2px 0 0" data-i18n-ignore>${esc(b.texto)}</div></td>
+      <td><b data-i18n-ignore>${esc(b.titulo)}</b><div class="ayuda" style="margin:2px 0 0" data-i18n-ignore>${esc(b.texto)}</div>${idiomasBanner(b)}</td>
       <td style="font-size:12px;white-space:nowrap">${esc(b.desde)} → ${esc(b.hasta)}</td>
       <td style="font-size:12px">${b.boton ? `<b data-i18n-ignore>${esc(b.boton)}</b><br>` : ""}${destino}</td>
       <td><span class="badge ${clase}">${estado}</span></td>
@@ -8490,6 +8490,7 @@ function abrirModalBanner(id) {
   $("mb-desde").value = datos.desde;
   $("mb-hasta").value = datos.hasta;
   $("mb-activo").checked = !!datos.activo;
+  cargarTraduccionesForm(b?.traducciones);
   mostrarErrorBanner("");
   cambiarDestinoBanner();
   $("modal-banner").classList.add("ver");
@@ -8556,6 +8557,13 @@ async function guardarBanner() {
   mostrarErrorBanner("");
   const boton = $("mb-guardar");
   boton.disabled = true;
+  // Antes de guardar se traducen los campos vacíos o desactualizados; si el servicio falla,
+  // el banner se guarda igual y esos idiomas muestran el español en el portal público.
+  let fallosTraduccion = 0;
+  if (BannersRepository.conTraducciones && window.TraductorBanner) {
+    fallosTraduccion = await traducirFormBanner(false);
+    datos.traducciones = leerTraduccionesForm(datos);
+  }
   try {
     if (bannerEditando) {
       const actualizado = await BannersRepository.actualizar(bannerEditando, datos, usuarioActual());
@@ -8575,7 +8583,146 @@ async function guardarBanner() {
   }
   cerrarModalBanner();
   pintarBanners();
-  toast("Banner guardado");
+  if (!BannersRepository.conTraducciones) toast("Banner guardado sin traducciones: falta ejecutar la migración de traducciones en Supabase.");
+  else if (fallosTraduccion) toast("Banner guardado. Algunas traducciones no se pudieron generar; esos idiomas mostrarán el texto en español.");
+  else toast("Banner guardado");
+}
+
+/* --- CMS: traducciones automáticas de la novedad (interno/js/interno-traductor.js) ---
+   Se guardan en portal_banners.traducciones: { en|fr|pt: { titulo, texto, boton }, origen: {…} }.
+   `origen` es el español que se tradujo; si el español cambia, la traducción se renueva al guardar,
+   salvo en los campos que el Admin editó a mano durante esta edición. */
+const IDIOMAS_BANNER = ["en", "fr", "pt"];
+const CAMPOS_BANNER = ["titulo", "texto", "boton"];
+let origenTraduccion = {};
+const campoTraduccion = (idioma, campo) => $(`mb-tr-${idioma}-${campo}`);
+
+// Insignias EN · FR · PT en la tabla: resaltadas si el idioma tiene al menos el título traducido.
+function idiomasBanner(b) {
+  if (!BannersRepository.conTraducciones) return "";
+  const tr = b.traducciones || {};
+  return `<div class="cms-idiomas" data-i18n-ignore>${IDIOMAS_BANNER
+    .map((idioma) => `<span${tr[idioma]?.titulo ? " data-ok" : ""} title="${idioma.toUpperCase()}">${idioma.toUpperCase()}</span>`).join("")}</div>`;
+}
+
+function cargarTraduccionesForm(traducciones) {
+  const tr = traducciones && typeof traducciones === "object" ? traducciones : {};
+  origenTraduccion = { ...(tr.origen || {}) };
+  IDIOMAS_BANNER.forEach((idioma) => CAMPOS_BANNER.forEach((campo) => {
+    const input = campoTraduccion(idioma, campo);
+    input.value = tr[idioma]?.[campo] || "";
+    delete input.dataset.manual;
+  }));
+  $("mb-trad").hidden = !BannersRepository.conTraducciones || !window.TraductorBanner;
+  $("mb-trad").open = false;
+  estadoTraduccion("");
+  resumenTraduccion();
+}
+
+// Lo que el Admin escribe a mano en una traducción se respeta al guardar.
+document.addEventListener("input", (event) => {
+  const input = event.target.closest?.("[data-traduccion]");
+  if (!input) return;
+  input.dataset.manual = "1";
+  resumenTraduccion();
+});
+
+function estadoTraduccion(texto, tono) {
+  const estado = $("mb-trad-estado");
+  estado.textContent = texto ? i18nT(texto) : "";
+  if (tono) estado.dataset.tono = tono;
+  else delete estado.dataset.tono;
+}
+
+function resumenTraduccion() {
+  const completos = IDIOMAS_BANNER.filter((idioma) => campoTraduccion(idioma, "titulo").value.trim()).length;
+  $("mb-trad-resumen").textContent = completos
+    ? `${completos}/${IDIOMAS_BANNER.length}`
+    : i18nT("Se generan al guardar");
+}
+
+// Español vigente del formulario (el botón solo cuenta si hay destino).
+function espanolFormBanner() {
+  return {
+    titulo: $("mb-titulo").value.trim(),
+    texto: $("mb-texto").value.trim(),
+    boton: $("mb-destino").value ? $("mb-boton").value.trim() : "",
+  };
+}
+
+// Traduce los campos pendientes. `forzar` (botón «Traducir automáticamente») renueva todos,
+// incluso los editados a mano. Devuelve cuántos campos no se pudieron traducir.
+async function traducirFormBanner(forzar) {
+  const es = espanolFormBanner();
+  const pendientes = {};
+  IDIOMAS_BANNER.forEach((idioma) => CAMPOS_BANNER.forEach((campo) => {
+    const input = campoTraduccion(idioma, campo);
+    if (!es[campo]) { input.value = ""; return; }
+    const desactualizado = origenTraduccion[campo] !== es[campo] && !input.dataset.manual;
+    if (forzar || !input.value.trim() || desactualizado) (pendientes[idioma] ||= []).push(campo);
+  }));
+  const idiomas = Object.keys(pendientes);
+  if (!idiomas.length) return 0;
+
+  const boton = $("mb-traducir");
+  boton.disabled = true;
+  estadoTraduccion("Traduciendo…");
+  let fallos = 0;
+  try {
+    const trabajos = idiomas.map((idioma) => {
+      const campos = Object.fromEntries(pendientes[idioma].map((campo) => [campo, es[campo]]));
+      return TraductorBanner.traducir(campos, [idioma]).then((r) => ({ idioma, ...r }));
+    });
+    const fallidos = new Set();
+    (await Promise.all(trabajos)).forEach(({ idioma, resultado, errores }) => {
+      pendientes[idioma].forEach((campo) => {
+        const input = campoTraduccion(idioma, campo);
+        const traducido = resultado[idioma]?.[campo];
+        if (traducido) {
+          input.value = traducido;
+          delete input.dataset.manual;
+        } else {
+          // Sin traducción vigente: mejor el español que un texto viejo.
+          if (origenTraduccion[campo] !== es[campo]) input.value = "";
+          fallidos.add(campo);
+        }
+      });
+      fallos += errores.length;
+      errores.forEach((e) => console.warn("Traducción automática:", e.idioma, e.campo, e.mensaje));
+    });
+    // Un campo queda al día cuando ningún idioma falló al traducirlo.
+    CAMPOS_BANNER.forEach((campo) => { if (!fallidos.has(campo)) origenTraduccion[campo] = es[campo]; });
+  } finally {
+    boton.disabled = false;
+  }
+  if (fallos) {
+    $("mb-trad").open = true;
+    estadoTraduccion("No fue posible traducir todo automáticamente. Puede completar los campos a mano o volver a intentarlo.", "error");
+  } else {
+    estadoTraduccion("Traducción automática lista: revísela antes de publicar.");
+  }
+  resumenTraduccion();
+  return fallos;
+}
+
+function leerTraduccionesForm(datos) {
+  const traducciones = { origen: {} };
+  // Si los tres idiomas tienen texto (traducido o escrito a mano), el campo queda al día con el
+  // español actual; así una edición manual no se sobrescribe en el próximo guardado.
+  CAMPOS_BANNER.forEach((campo) => {
+    const completo = datos[campo] && IDIOMAS_BANNER.every((idioma) => campoTraduccion(idioma, campo).value.trim());
+    traducciones.origen[campo] = completo ? datos[campo] : origenTraduccion[campo] || "";
+  });
+  IDIOMAS_BANNER.forEach((idioma) => {
+    const valores = {};
+    CAMPOS_BANNER.forEach((campo) => {
+      const limite = TraductorBanner.LIMITES[campo];
+      const valor = datos[campo] ? campoTraduccion(idioma, campo).value.trim().slice(0, limite) : "";
+      if (valor) valores[campo] = valor;
+    });
+    if (Object.keys(valores).length) traducciones[idioma] = valores;
+  });
+  return traducciones;
 }
 
 async function toggleBanner(id) {

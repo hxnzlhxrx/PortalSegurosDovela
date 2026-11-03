@@ -109,12 +109,20 @@ const PortalContenidoRepository = {
 
     async bannersVigentes() {
 
-        const { data, error } =
-            await db
+        const columnas = "id, titulo, texto, boton, url, desde, hasta, activo, orden";
+        const consulta = (seleccion) =>
+            db
                 .from("portal_banners")
-                .select("id, titulo, texto, boton, url, desde, hasta, activo, orden")
+                .select(seleccion)
                 .eq("activo", true)
                 .order("orden", { ascending: true });
+
+        // Las traducciones (EN/FR/PT) llegan con el banner. Si la base aún no tiene la columna
+        // (2026-11-03-banners-traducciones.sql sin ejecutar), se leen los banners sin ellas.
+        let { data, error } = await consulta(`${columnas}, traducciones`);
+        if (error?.code === "42703") {
+            ({ data, error } = await consulta(columnas));
+        }
 
         if (error) {
 

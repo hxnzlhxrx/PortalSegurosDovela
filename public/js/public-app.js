@@ -3385,16 +3385,28 @@ function pintarBanner(announce=false){
   if(!bannerSlide || !bannerDots) return;
   const slide=PUB_BANNERS[bIdx];
   bannerSlide.dataset.tone=['info','success','warning'][bIdx%3];
-  // Los banners del CMS llegan de la base: siempre se escapan.
-  const texto=valor=>escHtmlBanner(slide.cms?valor:i18nT(valor));
-  const cms=slide.cms?' data-i18n-ignore':'';
-  bannerSlide.innerHTML=`<div class="banner-copy"><p class="banner-label">${i18nT('NOVEDADES DOVELA')} / ${String(bIdx+1).padStart(2,'0')}</p><h2${cms}>${texto(slide.t)}</h2>${slide.s?`<p${cms}>${texto(slide.s)}</p>`:''}</div>${slide.cta&&slide.act?`<button type="button" class="btn btn-verde" data-banner-action><span${cms}>${texto(slide.cta)}</span> <span aria-hidden="true">↗</span></button>`:''}`;
+  // Los banners del CMS llegan de la base: siempre se escapan. Se muestran en el idioma activo
+  // con las traducciones guardadas desde el panel interno; si falta una, en español (lang="es").
+  const texto=key=>escHtmlBanner(slide.cms?textoBannerCms(slide,key).valor:i18nT(slide[key]));
+  const cms=key=>{
+    if(!slide.cms) return '';
+    return textoBannerCms(slide,key).respaldo?' data-i18n-ignore lang="es"':' data-i18n-ignore';
+  };
+  bannerSlide.innerHTML=`<div class="banner-copy"><p class="banner-label">${i18nT('NOVEDADES DOVELA')} / ${String(bIdx+1).padStart(2,'0')}</p><h2${cms('t')}>${texto('t')}</h2>${slide.s?`<p${cms('s')}>${texto('s')}</p>`:''}</div>${slide.cta&&slide.act?`<button type="button" class="btn btn-verde" data-banner-action><span${cms('cta')}>${texto('cta')}</span> <span aria-hidden="true">↗</span></button>`:''}`;
   bannerSlide.querySelector('[data-banner-action]')?.addEventListener('click',slide.act);
   bannerDots.innerHTML=PUB_BANNERS.map((_,index)=>`<button type="button" aria-label="${i18nT('Mostrar novedad {current} de {total}', { current:index+1, total:PUB_BANNERS.length })}" aria-current="${index===bIdx}"></button>`).join('');
   bannerDots.querySelectorAll('button').forEach((button,index)=>button.addEventListener('click',()=>{
     bIdx=index; pintarBanner(true); syncBannerRotation();
   }));
-  if(announce && bannerStatus) bannerStatus.textContent=i18nT('Novedad {current} de {total}: {title}', { current:bIdx+1, total:PUB_BANNERS.length, title:i18nT(slide.t) });
+  if(announce && bannerStatus) bannerStatus.textContent=i18nT('Novedad {current} de {total}: {title}', { current:bIdx+1, total:PUB_BANNERS.length, title:slide.cms?textoBannerCms(slide,'t').valor:i18nT(slide.t) });
+}
+// Texto de un banner del CMS en el idioma activo. `respaldo` indica que se muestra el español.
+const CAMPOS_TRADUCCION_BANNER={t:'titulo',s:'texto',cta:'boton'};
+function textoBannerCms(slide,key){
+  const locale=window.DovelaI18n?.locale||'es';
+  const traducido=locale==='es'?'':slide.tr?.[locale]?.[CAMPOS_TRADUCCION_BANNER[key]];
+  if(typeof traducido==='string' && traducido.trim()) return { valor:traducido.trim(), respaldo:false };
+  return { valor:slide[key], respaldo:locale!=='es' };
 }
 function syncBannerRotation(){
   const canRotate=PUB_BANNERS.length>1 && bannerVisible && !bannerHover && !bannerFocus && !bannerUserPaused && !reducedMotion.matches && !document.hidden;
@@ -3456,6 +3468,7 @@ async function cargarBannersCms(){
   const vigentes=filas.filter(b=>b.activo && b.desde<=hoy && b.hasta>=hoy && b.titulo);
   PUB_BANNERS.splice(0, PUB_BANNERS.length, ...vigentes.map(b=>({
     cms:true, t:b.titulo, s:b.texto||'', cta:b.boton||'',
+    tr:b.traducciones&&typeof b.traducciones==='object'?b.traducciones:null,
     act:b.boton && /^(#[A-Za-z][A-Za-z0-9_-]*|https:\/\/[^\s"<>]+)$/.test(b.url||'') ? ()=>irDestinoBanner(b.url) : null
   })));
   bIdx=0;
@@ -3734,6 +3747,94 @@ document.addEventListener('dovela:languagechange', () => {
    Se muestra en cada ingreso al portal. No se repite dentro de la misma visita: ni al volver
    al inicio, ni al recargar, ni al pasar desde el portal interno (ambos marcan la sesión de la
    pestaña). Nunca se abre sobre el diálogo de idioma: si ese diálogo está visible, espera. */
+/* Devtag en pantallas táctiles: sin hover, el efecto Expressive (trazo 1.5→3px + ondas) se
+   muestra con la clase .is-showcase (public/css/featured-glow.css):
+   1) una vez al llegar al pie (vitrina, ≥ 8 s entre repeticiones, nunca en bucle);
+   2) al tocar: el efecto arranca bajo el dedo y el enlace se abre tras una pausa breve (650 ms)
+      para que se alcance a ver. Un solo toque basta. La reapertura repite el clic sobre el mismo
+      enlace, así conserva target="_blank" y rel="me noopener noreferrer"; 650 ms queda dentro del
+      margen de gesto de iOS Safari (~1 s), por lo que la pestaña nueva no se bloquea.
+   Mouse, teclado y clics con modificadores no cambian: abren al instante. */
+(function initDevtagShowcase() {
+  const link = document.querySelector('[data-devtag-link]');
+  if (!link || !window.matchMedia) return;
+  const tactil = window.matchMedia('(hover: none), (pointer: coarse)');
+  const reducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)');
+  const DURACION_VITRINA = 2400;
+  const PAUSA_VITRINA = 8000;
+  const VENTANA_TOQUE = 800;
+  let ocultarTimer = 0;
+  let abrirTimer = 0;
+  let ultimaVitrina = -Infinity;
+  let ultimoToque = -Infinity;
+  let pendiente = false;
+  let dejarPasar = false;
+
+  function mostrar(duracion = DURACION_VITRINA) {
+    window.clearTimeout(ocultarTimer);
+    // Reinicia las ondas aunque la clase ya estuviera puesta.
+    link.classList.remove('is-showcase');
+    void link.offsetWidth;
+    link.classList.add('is-showcase');
+    ultimaVitrina = performance.now();
+    ocultarTimer = window.setTimeout(() => link.classList.remove('is-showcase'), duracion);
+  }
+
+  function limpiar() {
+    window.clearTimeout(ocultarTimer);
+    window.clearTimeout(abrirTimer);
+    pendiente = false;
+    link.classList.remove('is-showcase');
+  }
+
+  if ('IntersectionObserver' in window) {
+    new IntersectionObserver((entries) => {
+      if (!tactil.matches || pendiente || !entries[0].isIntersecting) return;
+      if (performance.now() - ultimaVitrina < PAUSA_VITRINA) return;
+      mostrar();
+    }, { threshold: .6 }).observe(link);
+  }
+
+  link.addEventListener('pointerdown', (event) => {
+    if (event.pointerType !== 'touch' && event.pointerType !== 'pen') return;
+    ultimoToque = performance.now();
+    if (!pendiente) mostrar();
+  });
+
+  link.addEventListener('click', (event) => {
+    if (dejarPasar) return; // la reapertura programada sigue su curso normal
+    const deToque = performance.now() - ultimoToque < VENTANA_TOQUE;
+    const conModificador = event.ctrlKey || event.metaKey || event.shiftKey || event.altKey || event.button !== 0;
+    if (!deToque || conModificador) return;
+    event.preventDefault();
+    if (pendiente) return; // un segundo toque durante la pausa no abre otra pestaña
+    pendiente = true;
+    mostrar();
+    abrirTimer = window.setTimeout(() => {
+      pendiente = false;
+      let salio = false;
+      const marcarSalida = () => { salio = true; };
+      window.addEventListener('blur', marcarSalida, { once: true });
+      window.addEventListener('pagehide', marcarSalida, { once: true });
+      document.addEventListener('visibilitychange', marcarSalida, { once: true });
+      dejarPasar = true;
+      link.click();
+      dejarPasar = false;
+      // Respaldo: si el navegador bloqueó la pestaña nueva, abrir en esta misma pestaña.
+      window.setTimeout(() => {
+        window.removeEventListener('blur', marcarSalida);
+        window.removeEventListener('pagehide', marcarSalida);
+        document.removeEventListener('visibilitychange', marcarSalida);
+        if (!salio && document.visibilityState === 'visible' && document.hasFocus()) window.location.assign(link.href);
+      }, 600);
+    }, reducedMotion.matches ? 250 : 650);
+  }, true);
+
+  // Al volver de Linktree el efecto no queda pegado.
+  window.addEventListener('pagehide', limpiar);
+  document.addEventListener('visibilitychange', () => { if (document.visibilityState === 'hidden') limpiar(); });
+})();
+
 (function initEntryTour() {
   const SESSION_KEY = 'dovela.site.session';
   if (!window.DovelaTour) return;
@@ -3748,41 +3849,182 @@ document.addEventListener('dovela:languagechange', () => {
   try { sessionStorage.setItem(SESSION_KEY, '1'); } catch (_) { /* modo privado */ }
 
   // Miniaturas y anotaciones: lienzo de 320×180 unidades (public/js/tour.js).
-  const { box, bars, icon, arrow } = window.DovelaTour.kit;
+  // Cada paso describe una función que existe en este portal; los textos los traduce i18n.js.
+  const { box, bars, icon, arrow, qr } = window.DovelaTour.kit;
   const LOGO = '<img src="public/assets/brand/dovela-logo-horizontal-dark.svg" alt="">';
   const card = (x, name, title) => box(x, 88, 92, 46, 'ts-card', `<span class="ts-ico">${icon(name)}</span><b>${title}</b>${bars(80, 55)}`);
   const select = (x, w, label, value) => box(x, 14, w, 22, 'ts-field', `<small>${label}</small><span>${value}</span>`);
   const row = (y, esp, name, prov, head) => box(14, y, 292, 17, head ? 'ts-row ts-row--head' : 'ts-row', `<span>${esp}</span><span>${name}</span><span>${prov}</span>`);
+  const badge = (tipo, label) => `<span class="ts-badge ts-badge--${tipo}">${label}</span>`;
+  const option = (x, name, label, on) => box(x, 54, 94, 50, `ts-card ts-option${on ? ' ts-option--on' : ''}`, `<span class="ts-ico">${icon(name)}</span><b>${label}</b>`);
+  const stepper = labels => `<span class="ts-stepper">${labels.map((_, i) => `<i${i === 0 ? ' data-on' : ''}>${i + 1}</i>`).join('')}</span>`
+    + `<span class="ts-steps">${labels.map(label => `<span>${label}</span>`).join('')}</span>`;
+  const doc = (y, name, req, done) => box(14, y, 200, 30, 'ts-doc', `<span class="ts-ico">${icon('documento')}</span><span class="ts-doc__txt"><b>${name}</b><small>${req}</small></span>${done ? badge('ok', icon('check')) : ''}`);
+  const formCard = (x, n, name) => box(x, 14, 142, 92, 'ts-card ts-formcard', `<small>${n} / PDF</small><b>${name}</b>${bars(90, 60)}<span class="ts-btns"><span class="ts-btn">Descargar</span><span class="ts-btn ts-btn--ghost">Ver en línea</span></span>`);
 
   const STEPS = [
     {
+      chapter: 'Bienvenida',
       title: 'Le damos la bienvenida a Dovela',
-      text: 'En menos de un minuto le mostramos cómo resolver sus gestiones en este portal.',
+      text: 'Este portal de autogestión reúne lo que un asegurado necesita: presentar reclamos, seguir su avance y encontrar atención médica, a cualquier hora y desde cualquier dispositivo.',
+      points: [
+        'Presente reclamos en línea, sin filas ni papeleo',
+        'Consulte el estado con su código o con el QR del comprobante',
+        'Encuentre médicos, clínicas y hospitales de la Red Médica'
+      ],
+      tip: 'Dovela Seguros es una entidad ficticia: explore con confianza, todos los datos son de demostración.',
       screen: box(0, 0, 320, 78, 'ts-hero', `<span class="ts-logo">${LOGO}</span><i class="ts-pill"></i><i class="ts-pill"></i><span class="ts-h1">Lo que más importa, <em>bien sostenido.</em></span>`)
         + card(14, 'claim', 'Presentar un reclamo') + card(114, 'network', 'Red Médica Dovela') + card(214, 'status', 'Consultar estado de reclamo'),
       notes: { highlight: [16, 304, 142], arrow: arrow(126, 160, 84, 170, 62, 140), note: [130, 146, -4, '¡Todo empieza aquí!'] }
     },
     {
-      title: 'Presente un reclamo',
-      text: 'Elija «Presentar un reclamo» y complete el formulario guiado. Las preguntas se ajustan según quién presenta.',
-      screen: box(14, 18, 128, 128, 'ts-card ts-card--big', `<small>GESTIÓN DE RECLAMOS</small><span class="ts-ico">${icon('claim')}</span><b>Presentar un reclamo</b>${bars(92, 84, 60)}<em>Iniciar solicitud <span>↗</span></em>`)
-        + box(158, 18, 148, 96, 'ts-panel', `<span class="ts-stepper"><i data-on>1</i><i>2</i><i>3</i></span><span class="ts-steps"><span>Perfil</span><span>Producto</span><span>Asegurado</span></span>${bars(40)}<i class="ts-input"></i>${bars(30)}<i class="ts-input"></i>`),
-      notes: { circle: [78, 82, 74, 72], arrow: arrow(236, 132, 268, 100, 244, 44), note: [176, 134, 3, '¡Un paso a la vez!'] }
+      chapter: 'Presentar un reclamo',
+      title: 'Un formulario que se adapta a usted',
+      text: 'Elija «Presentar un reclamo» y avance paso a paso: perfil, producto, asegurado, evento, documentos y confirmación. Cada paso se valida antes de continuar.',
+      points: [
+        'Asegurado, corredor u hospital: las preguntas cambian según quién presenta',
+        'Si no conoce su producto, elija «No estoy seguro» y un especialista lo validará',
+        'Servicio médico, dental u óptico, en unos 3 a 5 minutos'
+      ],
+      screen: box(14, 10, 292, 36, 'ts-panel ts-panel--tight', stepper(['Perfil', 'Producto', 'Asegurado', 'Evento', 'Documentos', 'Confirmar']))
+        + option(14, 'persona', 'Asegurado / Titular', true) + option(113, 'acuerdo', 'Corredor de seguros') + option(212, 'hospital', 'Hospital / Clínica')
+        + box(14, 112, 180, 26, 'ts-field', '<small>Producto de la póliza</small><span>No estoy seguro</span>')
+        + box(14, 146, 292, 20, 'ts-tabs', [['estetoscopio', 'Servicio Médico', true], ['diente', 'Servicio Dental'], ['lentes', 'Servicio Óptico']]
+          .map(([ico, label, on]) => `<span class="ts-tab"${on ? ' data-on' : ''}>${icon(ico)}<span>${label}</span></span>`).join('')),
+      notes: { circle: [61, 79, 52, 30], arrow: arrow(212, 126, 180, 100, 118, 84), note: [204, 114, -4, '¡Se adapta a usted!'] }
     },
     {
+      chapter: 'Presentar un reclamo',
+      title: 'Sus documentos, sin dudas',
+      text: 'La lista de documentos se arma según la línea del seguro y quién presenta. Cada documento indica si es obligatorio, si admite varios archivos y su tamaño máximo.',
+      points: [
+        'Adjunte PDF, JPG o PNG, o tome la foto con la cámara del celular',
+        'Vea los archivos cargados y quite los que no necesite',
+        'Revise un resumen completo antes de enviar'
+      ],
+      tip: '¿Le falta el formulario? Puede descargarlo desde el mismo paso de documentos.',
+      screen: doc(12, 'Formulario de Reclamos de Gastos Médicos firmado', 'Obligatorio', true)
+        + doc(48, 'Facturas y recibos originales', 'Obligatorio', true)
+        + doc(84, 'Informe o receta médica', 'Obligatorio')
+        + doc(120, 'Resultados de exámenes / laboratorio', 'Opcional')
+        + box(224, 12, 82, 100, 'ts-drop', `${icon('camara')}<span>PDF, JPG o PNG</span>`),
+      notes: { circle: [265, 62, 48, 56], arrow: arrow(236, 150, 276, 148, 268, 124), note: [150, 152, -3, '¡Hasta con la cámara!'] }
+    },
+    {
+      chapter: 'Presentar un reclamo',
+      title: 'Un envío que no se pierde',
+      text: 'Al confirmar, el portal reserva su radicado, registra el reclamo y sube los documentos mientras una barra le muestra el avance.',
+      points: [
+        'Reintentos automáticos si la conexión falla',
+        'Protección contra envíos duplicados',
+        'Confirmación inmediata con su número de radicado'
+      ],
+      screen: box(14, 14, 196, 152, 'ts-panel')
+        + box(26, 24, 13, 13, 'ts-ico', icon('subir'))
+        + box(26, 44, 172, 12, 'ts-title', 'Enviando su reclamo')
+        + box(26, 60, 172, 8, 'ts-muted', 'Cargando los documentos...')
+        + box(26, 78, 172, 8, 'ts-progress', '<i style="width:72%"></i>')
+        + box(26, 92, 60, 10, 'ts-value', '72%')
+        + box(26, 110, 172, 16, 'ts-muted', 'No cierre esta ventana mientras procesamos su solicitud.')
+        + box(26, 140, 172, 14, 'ts-chip', `${icon('actualizar')}<span>Reintentos automáticos</span>`),
+      notes: { circle: [112, 82, 96, 12], arrow: arrow(258, 84, 252, 104, 214, 84), note: [222, 36, -5, '¡No se pierde nada!', 90] }
+    },
+    {
+      chapter: 'Después de enviar',
+      title: 'Su radicado y su comprobante',
+      text: 'Al terminar recibe un radicado único y descarga el comprobante de recepción en PDF, en el idioma que esté usando.',
+      points: [
+        'El radicado indica el año, el día, el consecutivo y el tipo de servicio',
+        'El comprobante resume la línea, el producto y los documentos recibidos',
+        'Incluye un código QR que abre la consulta de estado en el celular'
+      ],
+      screen: box(14, 10, 190, 160, 'ts-panel')
+        + box(24, 18, 170, 12, 'ts-title', 'Comprobante de Recepción')
+        + box(24, 36, 108, 18, 'ts-input ts-code', 'SGP-26301-0007-M')
+        + box(24, 62, 104, 50, '', bars(92, 70, 84, 60, 76))
+        + box(140, 58, 52, 52, 'ts-qrbox', qr())
+        + box(24, 140, 170, 18, 'ts-btn', `${icon('documento')}<span>Descargar comprobante PDF</span>`)
+        + box(214, 10, 96, 104, 'ts-panel ts-legend', '<span><b>26</b> Año</span><span><b>301</b> Día del año</span><span><b>0007</b> Consecutivo</span><span><b>M</b> Servicio</span>'),
+      notes: { circle: [166, 84, 32, 32], arrow: arrow(240, 128, 214, 112, 200, 98), note: [214, 126, -4, '¡Escanee y listo!'] }
+    },
+    {
+      chapter: 'Después de enviar',
       title: 'Siga el estado de su reclamo',
-      text: 'Con el código de seguimiento que recibe al presentar, consulte el progreso en «Consultar estado de reclamo».',
-      screen: box(14, 14, 176, 152, 'ts-panel ts-status', `<small>SEGUIMIENTO DE RECLAMOS</small><b>Consultar estado de reclamo</b><label>Código de reclamo</label><span class="ts-input ts-code">SGP-26294-0001-M</span>${bars(46)}<i class="ts-input"></i><span class="ts-btn">Consultar estado</span>`),
-      notes: { highlight: [30, 104, 72], arrow: arrow(226, 62, 186, 98, 118, 78), note: [198, 40, -6, 'Su código va aquí'] }
+      text: 'Ingrese su código y la cédula o pasaporte del asegurado. La información solo se muestra si ambos coinciden, para proteger su privacidad.',
+      points: [
+        'Vea el estado actual y el historial de cambios',
+        'Lea el mensaje que el equipo de Dovela deja para usted',
+        'Desde el QR del comprobante, el código se carga solo'
+      ],
+      tip: 'Estados posibles: Recibido, En Proceso, Pendiente de Información, Pagado y Rechazado.',
+      screen: box(14, 14, 176, 140, 'ts-panel ts-status', `<small>SEGUIMIENTO DE RECLAMOS</small><b>Consultar estado de reclamo</b><label>Código de reclamo</label><span class="ts-input ts-code">SGP-26294-0001-M</span>${bars(46)}<i class="ts-input"></i><span class="ts-btn">Consultar estado</span>`)
+        + box(198, 14, 108, 140, 'ts-panel', '')
+        + box(206, 22, 92, 10, 'ts-label', 'Estado de su reclamo')
+        + box(206, 36, 92, 10, '', badge('warn', 'En Proceso'))
+        + box(206, 52, 92, 34, 'ts-timeline', '<span>Recibido</span><span data-on>En Proceso</span>')
+        + box(206, 92, 92, 54, 'ts-area', `<b>Mensaje de Dovela</b>${bars(90, 74, 50)}`),
+      notes: { highlight: [30, 104, 72], arrow: arrow(150, 164, 110, 150, 96, 86), note: [154, 156, -3, 'Su código va aquí'] }
     },
     {
+      chapter: 'Atención médica',
       title: 'Encuentre atención en la Red Médica',
-      text: 'Busque médicos, clínicas y hospitales por especialidad, provincia o nombre. Puede cambiar el idioma y la apariencia desde la barra superior.',
+      text: 'Busque médicos, clínicas y hospitales del directorio de prestadores y combine filtros por especialidad, provincia o nombre.',
+      points: [
+        'Descargue el directorio completo en PDF o Excel',
+        'O exporte solo los resultados filtrados',
+        'Téngalo a mano para compartirlo o consultarlo sin conexión'
+      ],
       screen: select(14, 96, 'Especialidad', 'Pediatría') + select(116, 96, 'Provincia', 'Valdoria') + select(218, 88, '', 'Okafor…')
         + row(48, 'Especialidad', 'Nombre', 'Provincia', true) + row(66, 'Pediatría', 'Okafor, Amara', 'Valdoria')
         + row(84, 'Pediatría', 'Nakamura, Jordan', 'Serranova') + row(102, 'Pediatría', 'Haddad, Itzel', 'Valdoria')
         + box(14, 140, 56, 17, 'ts-btn', 'PDF') + box(76, 140, 56, 17, 'ts-btn ts-btn--green', 'Excel'),
       notes: { circle: [114, 25, 106, 17], highlight: [16, 130, 164], arrow: arrow(270, 144, 300, 96, 224, 40), note: [150, 140, -3, 'Filtre y descargue'] }
+    },
+    {
+      chapter: 'Recursos',
+      title: 'Formularios y orientación, siempre a mano',
+      text: 'En la portada encontrará los formularios oficiales para descargar o ver en línea, la guía para seguir su reclamo con el código QR y la orientación para emergencias médicas.',
+      points: [
+        'Formulario de Reclamos de Gastos Médicos',
+        'Formulario de Pre-Autorización de Beneficios',
+        'Coordinación y emergencias médicas'
+      ],
+      screen: formCard(14, '01', 'Formulario de Reclamos de Gastos Médicos') + formCard(164, '02', 'Formulario de Pre-Autorización de Beneficios')
+        + box(14, 114, 292, 36, 'ts-doc', `<span class="ts-ico">${icon('ambulancia')}</span><span class="ts-doc__txt"><b>Coordinación y emergencias médicas</b>${bars(70)}</span>`),
+      notes: { circle: [85, 60, 76, 50], arrow: arrow(176, 162, 120, 172, 92, 114), note: [180, 154, -3, 'Descárguelos aquí'] }
+    },
+    {
+      chapter: 'Novedades',
+      title: 'Novedades que hablan su idioma',
+      text: 'El carrusel de la portada muestra las novedades que el equipo publica desde el panel interno, cada una con sus fechas de vigencia y un botón hacia la sección indicada.',
+      points: [
+        'Se traducen automáticamente al inglés, francés y portugués',
+        'Rotan solas y se pueden pausar en cualquier momento',
+        'Cada novedad puede llevar a una sección del portal o a un enlace'
+      ],
+      screen: box(14, 12, 292, 96, 'ts-banner', `<small>NOVEDADES DOVELA / 01</small><b>Encuentre atención cuando la necesite</b>${bars(70, 50)}<span class="ts-btn ts-btn--green">Consultar red médica</span>`)
+        + box(14, 118, 60, 14, 'ts-dotsrow', '<i data-on></i><i></i><i></i>')
+        + box(80, 116, 40, 16, 'ts-btn ts-btn--ghost', 'Pausar')
+        + box(186, 140, 120, 22, 'ts-tabs', ['ES', 'EN', 'FR', 'PT'].map((code, i) => `<span class="ts-tab" data-i18n-ignore${i === 1 ? ' data-on' : ''}>${code}</span>`).join('')),
+      notes: { circle: [244, 151, 66, 16], arrow: arrow(112, 158, 150, 174, 178, 154), note: [20, 146, -3, '¡En su idioma!'] }
+    },
+    {
+      chapter: 'Su portal',
+      title: 'Su portal, a su manera',
+      text: 'Elija entre español, inglés, francés y portugués, y cambie entre modo claro y oscuro desde la barra superior. Su elección se recuerda en la próxima visita.',
+      points: [
+        'Diseño adaptable, del celular al escritorio',
+        'Navegable con teclado y compatible con lectores de pantalla',
+        'Respeta la preferencia de movimiento reducido del sistema'
+      ],
+      tip: 'Vuelva a esta guía cuando quiera con el botón «Cómo funciona» de la barra superior.',
+      screen: box(0, 0, 320, 34, 'ts-hero ts-nav', `<span class="ts-logo">${LOGO}</span>`)
+        + box(150, 9, 50, 16, 'ts-select ts-select--dark', '<span data-i18n-ignore>Español</span>')
+        + box(206, 9, 30, 16, 'ts-switch', '<i></i>')
+        + box(242, 9, 70, 16, 'ts-btn ts-btn--light', `${icon('idea')}<span>Cómo funciona</span>`)
+        + box(14, 46, 166, 120, 'ts-panel ts-device', box(8, 8, 150, 30, 'ts-hero', '') + box(8, 46, 46, 40, 'ts-card', '') + box(60, 46, 46, 40, 'ts-card', '') + box(112, 46, 46, 40, 'ts-card', '') + box(8, 94, 150, 16, '', bars(80, 60)))
+        + box(192, 46, 52, 120, 'ts-panel ts-device ts-device--phone', box(5, 8, 42, 26, 'ts-hero', '') + box(5, 40, 42, 22, 'ts-card', '') + box(5, 66, 42, 22, 'ts-card', '') + box(5, 94, 42, 14, '', bars(90, 60))),
+      notes: { circle: [192, 17, 48, 12], arrow: arrow(276, 72, 286, 46, 244, 26), note: [252, 78, -5, '¡Elija idioma y tema!', 64] }
     }
   ];
 

@@ -828,18 +828,42 @@ const UsuariosRepository = {
  *
  * =========================================== */
 
-const COLUMNAS_BANNER =
+const COLUMNAS_BANNER_BASE =
     "id, titulo, texto, boton, url, desde, hasta, activo, orden, actualizado_por, actualizado_en";
+const COLUMNAS_BANNER = COLUMNAS_BANNER_BASE + ", traducciones";
+
+// Falta la columna traducciones (2026-11-03-banners-traducciones.sql aún no se ejecutó):
+// Postgres responde 42703 al leerla y PostgREST PGRST204 al escribirla.
+function faltaColumnaTraducciones(error) {
+    const texto = `${error?.message || ""} ${error?.details || ""}`;
+    return (error?.code === "42703" || error?.code === "PGRST204") && texto.includes("traducciones");
+}
 
 const BannersRepository = {
 
+    // false cuando la base todavía no tiene la columna de traducciones.
+    conTraducciones: true,
+
+    // Ejecuta la consulta con la columna de traducciones y, si la base aún no la tiene,
+    // la repite sin ella para que el CMS siga funcionando.
+    async conRespaldo(consulta, payload) {
+        if (this.conTraducciones) {
+            const resultado = await consulta(COLUMNAS_BANNER, payload);
+            if (!resultado.error || !faltaColumnaTraducciones(resultado.error)) return resultado;
+            console.warn("portal_banners.traducciones no existe; ejecute supabase/2026-11-03-banners-traducciones.sql.");
+            this.conTraducciones = false;
+        }
+        const { traducciones, ...resto } = payload || {};
+        return consulta(COLUMNAS_BANNER_BASE, payload ? resto : payload);
+    },
+
     async obtenerTodos() {
 
-        const { data, error } =
-            await db
+        const { data, error } = await this.conRespaldo((columnas) =>
+            db
                 .from("portal_banners")
-                .select(COLUMNAS_BANNER)
-                .order("orden", { ascending: true });
+                .select(columnas)
+                .order("orden", { ascending: true }));
 
         if (error) {
 
@@ -856,12 +880,13 @@ const BannersRepository = {
 
     async crear(banner, usuario) {
 
-        const { data, error } =
-            await db
+        const { data, error } = await this.conRespaldo((columnas, fila) =>
+            db
                 .from("portal_banners")
-                .insert({ ...banner, actualizado_por: usuario || null })
-                .select(COLUMNAS_BANNER)
-                .single();
+                .insert(fila)
+                .select(columnas)
+                .single(),
+            { ...banner, actualizado_por: usuario || null });
 
         if (error) {
 
@@ -878,17 +903,18 @@ const BannersRepository = {
 
     async actualizar(id, cambios, usuario) {
 
-        const { data, error } =
-            await db
+        const { data, error } = await this.conRespaldo((columnas, fila) =>
+            db
                 .from("portal_banners")
-                .update({
-                    ...cambios,
-                    actualizado_por: usuario || null,
-                    actualizado_en: new Date().toISOString()
-                })
+                .update(fila)
                 .eq("id", id)
-                .select(COLUMNAS_BANNER)
-                .single();
+                .select(columnas)
+                .single(),
+            {
+                ...cambios,
+                actualizado_por: usuario || null,
+                actualizado_en: new Date().toISOString()
+            });
 
         if (error) {
 

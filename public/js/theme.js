@@ -82,6 +82,20 @@
     let settleTimer = 0;
     let suppressClickUntil = 0;
 
+    // Recorrido del círculo. Si --theme-thumb-end es un número literal se usa tal cual; si es una
+    // expresión (p. ej. con unidades de contenedor), se mide del diseño real: interior del track
+    // menos el círculo y sus dos márgenes. Así el arrastre coincide con la posición final aunque el
+    // borde se redondee a píxeles del dispositivo (escalado 125 % / 150 %).
+    function thumbTravel() {
+      const raw = getComputedStyle(track).getPropertyValue('--theme-thumb-end').trim();
+      if (/^-?[\d.]+px$/.test(raw)) return Number.parseFloat(raw);
+      const t = getComputedStyle(track);
+      const inner = Number.parseFloat(t.width) - Number.parseFloat(t.borderLeftWidth) - Number.parseFloat(t.borderRightWidth);
+      const s = getComputedStyle(thumb);
+      const travel = inner - Number.parseFloat(s.width) - 2 * Number.parseFloat(s.left);
+      return Number.isFinite(travel) && travel > 0 ? travel : 24;
+    }
+
     function finishSettle() {
       shell.classList.remove('is-settling');
       thumb.style.removeProperty('transform-origin');
@@ -130,7 +144,7 @@
     control.addEventListener('pointerdown', (event) => {
       if (event.button !== 0 || !event.isPrimary) return;
 
-      const end = Number.parseFloat(getComputedStyle(track).getPropertyValue('--theme-thumb-end')) || 24;
+      const end = thumbTravel();
       gesture = {
         id: event.pointerId,
         startX: event.clientX,

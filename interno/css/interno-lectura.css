@@ -7,44 +7,83 @@
    - Semánticos (éxito, alerta, error) y el azul profundo de la marca se conservan.
    Se activa con html[data-reading="on"] (interno/js/interno-lectura.js). */
 
-/* ---------- Claro ---------- */
+/* ---------- Claro ----------
+   Criterios de protección visual (referencia: ISO 9241-303 / TÜV "Eye Comfort", WCAG 2.2):
+   - Sin blanco puro y brillo moderado: el fondo de trabajo baja de L* 95–98 a L* 85–89
+     (luminancia relativa 0.67–0.75 en lugar de 0.88–0.94: −22 a −24 % de luz emitida).
+   - Menos azul: en las superficies el canal azul queda ~8–11 % por debajo del rojo (papel crema).
+   - Contraste suficiente pero no extremo: texto principal 10–12:1 (AAA ≥ 7:1, evita el
+     deslumbramiento de 17:1+), secundario ≥ 7.2:1, atenuado ≥ 5.2:1; enlaces/acento ≥ 4.9:1;
+     bordes de controles ≥ 3.1:1 en todas las superficies (también las hundidas). Error, éxito y alerta ≥ 4.7:1 en todas las superficies. */
 html[data-theme="light"][data-reading="on"] {
   --brand-primary: #243B59;
   --brand-primary-hover: #2E4B6D;
-  --brand-secondary: #3157C4;
-  --brand-tide: #386AD8;
-  --brand-accent: #386AD8;
-  --brand-accent-hover: #3157C4;
-  --brand-accent-strong: #3157C4;
-  --brand-accent-soft: rgb(56 106 216 / .10);
-  --info: #3157C4;
+  --brand-secondary: #1C3F91;
+  --brand-tide: #3360C4;
+  --brand-accent: #254AAC;
+  --brand-accent-hover: #1C3F91;
+  --brand-accent-strong: #1C3F91;
+  --brand-accent-soft: rgb(37 74 172 / .11);
+  --info: #254AAC;
+  --error: #A61819;
+  --error-rgb: 166 24 25;
+  --success: #0E6030;
+  --warning: #7D4605;
 
-  --text-primary: #2B2824;
-  --text-secondary: #48433C;
-  --text-muted: #5E584F;
+  --text-primary: #24201B;
+  --text-secondary: #3D3731;
+  --text-muted: #534C44;
+  --text-on-accent: #EFEAE1;
 
-  --surface-base: #F4F1EA;
-  --surface-raised: #FAF8F3;
-  --surface-elevated: #FAF8F3;
-  --surface-sunken: #ECE8DF;
-  --surface-tint: #ECE8DE;
-  --surface-translucent: rgb(250 248 243 / .82);
-  --border-subtle: #D6D0C4;
-  --border-strong: #A29A8C;
+  --surface-base: #DCD5C7;
+  --surface-raised: #E3DED2;
+  --surface-elevated: #E6E0D6;
+  --surface-sunken: #D3CBBB;
+  --surface-tint: #D6CEBE;
+  --surface-translucent: rgb(227 222 210 / .84);
+  --border-subtle: #BFB6A5;
+  --border-strong: #776E5E;
 
-  --glass-fill: rgb(250 248 243 / .86);
-  --glass-edge: rgb(72 67 60 / .14);
-  --glass-highlight: inset 0 1px 0 rgb(255 253 248 / .9);
-  --glow-info: 0 0 0 3px rgb(56 106 216 / .14);
+  --elev-subtle: 0 1px 3px rgb(60 48 32 / .08), 0 8px 20px rgb(60 48 32 / .05);
+  --elev-medium: 0 8px 24px rgb(60 48 32 / .10);
+  --elev-large: 0 18px 44px rgb(60 48 32 / .14);
+
+  --glass-fill: rgb(227 222 210 / .88);
+  --glass-edge: rgb(67 61 54 / .16);
+  --glass-highlight: inset 0 1px 0 rgb(234 229 220 / .7);
+  --glow-info: 0 0 0 3px rgb(37 74 172 / .16);
 
   --brand-primary-rgb: 36 59 89;
-  --brand-secondary-rgb: 49 87 196;
-  --brand-tide-rgb: 56 106 216;
-  --brand-accent-rgb: 56 106 216;
-  --brand-accent-strong-rgb: 49 87 196;
-  --surface-tint-rgb: 236 232 222;
-  --surface-rgb: 250 248 243;
+  --brand-secondary-rgb: 28 63 145;
+  --brand-tide-rgb: 51 96 196;
+  --brand-accent-rgb: 37 74 172;
+  --brand-accent-strong-rgb: 28 63 145;
+  --surface-tint-rgb: 214 206 190;
+  --surface-rgb: 227 222 210;
 }
+
+/* Superficies con blanco o azul pálido fijo en public/css/theme.css (no usan variables):
+   se llevan a la misma escala de papel para que ninguna quede más brillante que el resto. */
+html[data-theme="light"][data-reading="on"] body { background: var(--surface-base); }
+html[data-theme="light"][data-reading="on"] .tabla-scroll { background: rgb(var(--surface-rgb) / .86); }
+html[data-theme="light"][data-reading="on"] .tabla-scroll th { background: var(--surface-tint); }
+html[data-theme="light"][data-reading="on"] :where(.doc, .resumen, .tips-foto, .aviso-inline) { background-color: rgb(var(--surface-tint-rgb) / .8); }
+html[data-theme="light"][data-reading="on"] .btn-secondary,
+html[data-theme="light"][data-reading="on"] .chip-esp { background: #CEC6B6; border-color: var(--border-subtle); }
+html[data-theme="light"][data-reading="on"] .chip-esp { box-shadow: inset 0 0 0 1px var(--border-subtle); }
+html[data-theme="light"][data-reading="on"] .btn-secondary:hover { background: #C3BAA8; }
+html[data-theme="light"][data-reading="on"] .login-panel { background: rgb(var(--surface-rgb) / .95); }
+html[data-theme="light"][data-reading="on"] .subtabs { background: var(--surface-tint); }
+html[data-theme="light"][data-reading="on"] :is(.subtab:hover, .subtab.on, .tipo.sel, .servicio-card.sel) { background: #CBCBCE; }
+html[data-theme="light"][data-reading="on"] .kpi { background: linear-gradient(150deg, rgb(var(--surface-rgb) / .96), rgb(var(--surface-tint-rgb) / .9)); }
+html[data-theme="light"][data-reading="on"] .kpi.acento .v { color: var(--brand-accent); }
+html[data-theme="light"][data-reading="on"] .kpi.rojo .v { color: var(--error); }
+html[data-theme="light"][data-reading="on"] .login-panel :where(.language-select-wrap, .theme-switch__track, .btn-lectura:not([aria-pressed="true"])) {
+  background: linear-gradient(135deg, rgb(var(--surface-rgb) / .9), rgb(var(--surface-tint-rgb) / .8));
+  box-shadow: 0 4px 12px rgb(60 48 32 / .1), inset 0 1px rgb(234 229 220 / .6);
+}
+html[data-theme="light"][data-reading="on"] .theme-switch__track { background: #CEC6B6; border-color: var(--border-subtle); }
+html[data-theme="light"][data-reading="on"] .theme-switch__thumb { background: #EAE5DC; }
 
 /* ---------- Oscuro ---------- */
 html[data-reading="on"]:not([data-theme="light"]) {
@@ -100,6 +139,36 @@ html[data-reading="on"] body::after {
 }
 html[data-reading="on"]:not([data-theme="light"]) body::after { background: rgb(255 160 50 / .05); }
 
+/* Textura de papel (estilo "modo lectura · papel" de los teléfonos): una capa fija sobre todas las
+   superficies con grano marcado + fibra casi imperceptible (sin manchas), como papel mate sin blanquear. Rompe el
+   brillo uniforme de los fondos planos, que es lo que cansa la vista en jornadas largas.
+   - Textura procedural (SVG feTurbulence en escala de grises, centrada en gris medio, mosaico
+     cosido de 280 px): sin imágenes ni peticiones extra; se rasteriza una sola vez.
+   - soft-light: el gris medio no cambia nada; el grano solo oscurece o aclara unos puntos, así que
+     el tono de la paleta y el contraste del texto se mantienen (variación de luz ≈ ±4 % en el grano).
+   - Queda debajo del filtro cálido (body::after) y nunca recibe clics. */
+html[data-reading="on"] body::before {
+  content: "";
+  position: fixed;
+  inset: 0;
+  z-index: 2147482999;
+  pointer-events: none;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='280' height='280'%3E%3Cfilter id='p' x='0' y='0' width='100%25' height='100%25' color-interpolation-filters='sRGB'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.82' numOctaves='3' seed='4' stitchTiles='stitch' result='g'/%3E%3CfeColorMatrix in='g' values='1 0 0 0 0 1 0 0 0 0 1 0 0 0 0 0 0 0 0 1' result='gg'/%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.03 .045' numOctaves='2' seed='11' stitchTiles='stitch' result='f'/%3E%3CfeColorMatrix in='f' values='.33 .33 .33 0 0 .33 .33 .33 0 0 .33 .33 .33 0 0 0 0 0 0 1' result='ff'/%3E%3CfeComposite in='gg' in2='ff' operator='arithmetic' k2='.9' k3='.25' k4='-.075'/%3E%3CfeComponentTransfer%3E%3CfeFuncR type='linear' slope='1.6' intercept='-.3'/%3E%3CfeFuncG type='linear' slope='1.6' intercept='-.3'/%3E%3CfeFuncB type='linear' slope='1.6' intercept='-.3'/%3E%3C/feComponentTransfer%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23p)'/%3E%3C/svg%3E");
+  background-size: 280px 280px;
+  mix-blend-mode: soft-light;
+  opacity: .55;
+}
+/* En oscuro soft-light aclara más el grano sobre el carbón: se atenúa para un papel gris mate. */
+html[data-reading="on"]:not([data-theme="light"]) body::before { opacity: .3; }
+/* Alto contraste o menos transparencia: sin textura (fondos planos). Tampoco se imprime. */
+@media (prefers-contrast: more), (prefers-reduced-transparency: reduce) {
+  html[data-reading="on"] body::before { display: none; }
+}
+@media print {
+  html[data-reading="on"] body::before,
+  html[data-reading="on"] body::after { display: none; }
+}
+
 /* ---------- Botón con ícono de ojo (junto al idioma y al interruptor claro/oscuro) ----------
    Mismo tamaño que esos controles (--ctl-ancho × --ctl-alto) y mismo comportamiento expresivo:
    vidrio, elevación al pasar el cursor, compresión al pulsar y anillo de foco vienen de las reglas
@@ -152,7 +221,8 @@ html[data-theme="light"] :is(#v-landing, .login-panel) .btn-lectura[aria-pressed
   color: #92400E;
 }
 @media (forced-colors: active) {
-  html[data-reading="on"] body::after { display: none; }
+  html[data-reading="on"] body::after,
+  html[data-reading="on"] body::before { display: none; }
   .btn-lectura { border: 2px solid ButtonText; }
   .btn-lectura[aria-pressed="true"] { outline: 2px solid Highlight; }
 }

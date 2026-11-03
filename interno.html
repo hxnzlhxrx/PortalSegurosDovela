@@ -926,6 +926,43 @@
       </div>
       <label style="display:flex;gap:8px;align-items:center;margin:4px 0 12px"><input type="checkbox" id="mb-activo"
           style="width:auto"> Activo (se publica dentro de su vigencia)</label>
+      <details class="cms-trad" id="mb-trad">
+        <summary>Traducciones <span class="cms-trad-codigos" data-i18n-ignore>EN · FR · PT</span> <span class="cms-trad-resumen" id="mb-trad-resumen"></span></summary>
+        <p class="ayuda">Se traducen automáticamente al guardar. Revíselas y ajústelas si lo necesita: lo que edite a mano se conserva. Un campo vacío muestra el texto en español.</p>
+        <div class="cms-trad-grid">
+          <fieldset class="cms-trad-idioma" data-idioma="en">
+            <legend data-i18n-ignore lang="en">English</legend>
+            <div class="campo"><label for="mb-tr-en-titulo">Título</label>
+              <input id="mb-tr-en-titulo" lang="en" maxlength="90" data-traduccion="en:titulo"></div>
+            <div class="campo"><label for="mb-tr-en-texto">Texto</label>
+              <textarea id="mb-tr-en-texto" lang="en" rows="2" maxlength="220" data-traduccion="en:texto"></textarea></div>
+            <div class="campo"><label for="mb-tr-en-boton">Texto del botón</label>
+              <input id="mb-tr-en-boton" lang="en" maxlength="40" data-traduccion="en:boton"></div>
+          </fieldset>
+          <fieldset class="cms-trad-idioma" data-idioma="fr">
+            <legend data-i18n-ignore lang="fr">Français</legend>
+            <div class="campo"><label for="mb-tr-fr-titulo">Título</label>
+              <input id="mb-tr-fr-titulo" lang="fr" maxlength="90" data-traduccion="fr:titulo"></div>
+            <div class="campo"><label for="mb-tr-fr-texto">Texto</label>
+              <textarea id="mb-tr-fr-texto" lang="fr" rows="2" maxlength="220" data-traduccion="fr:texto"></textarea></div>
+            <div class="campo"><label for="mb-tr-fr-boton">Texto del botón</label>
+              <input id="mb-tr-fr-boton" lang="fr" maxlength="40" data-traduccion="fr:boton"></div>
+          </fieldset>
+          <fieldset class="cms-trad-idioma" data-idioma="pt">
+            <legend data-i18n-ignore lang="pt">Português</legend>
+            <div class="campo"><label for="mb-tr-pt-titulo">Título</label>
+              <input id="mb-tr-pt-titulo" lang="pt" maxlength="90" data-traduccion="pt:titulo"></div>
+            <div class="campo"><label for="mb-tr-pt-texto">Texto</label>
+              <textarea id="mb-tr-pt-texto" lang="pt" rows="2" maxlength="220" data-traduccion="pt:texto"></textarea></div>
+            <div class="campo"><label for="mb-tr-pt-boton">Texto del botón</label>
+              <input id="mb-tr-pt-boton" lang="pt" maxlength="40" data-traduccion="pt:boton"></div>
+          </fieldset>
+        </div>
+        <div class="cms-trad-acciones">
+          <button class="btn btn-ghost btn-sm" type="button" id="mb-traducir" onclick="traducirFormBanner(true)"><span class="ico" data-icon="sparkle" aria-hidden="true"></span> Traducir automáticamente</button>
+          <span class="cms-trad-estado" id="mb-trad-estado" role="status" aria-live="polite"></span>
+        </div>
+      </details>
       <p class="ayuda" style="margin-bottom:6px">Vista previa</p>
       <div class="cms-preview" id="mb-preview" aria-live="polite"></div>
       <p class="cms-error" id="mb-error" role="alert" hidden></p>
@@ -1098,6 +1135,7 @@
 
   <script src="interno/js/interno-reservas.js"></script>
 
+  <script src="interno/js/interno-traductor.js"></script>
   <script src="interno/js/interno-app.js"></script>
   <script src="public/js/tour.js"></script>
   <script src="interno/js/interno-tour.js"></script>

@@ -340,6 +340,26 @@
 html[data-theme="light"] .footer__devtag,
 html[data-theme="light"] .footer__devtag:visited { color: #334155; }
 
+/* The v1 state rules above (:hover, :focus-visible, aria-pressed) are not limited to fine pointers.
+   Touch browsers keep :hover after a tap ("sticky hover"), so v1 repainted its raised button
+   (border, white inset edge, drop shadow, lift) behind the v2 glow mask. Neutralize that surface
+   for every input; v2's own hover and press styles below still apply on top. */
+.footer__devtag:hover,
+.footer__devtag:focus,
+.footer__devtag:focus-visible,
+.footer__devtag[aria-pressed="true"] {
+  border-color: transparent;
+  background: transparent;
+  box-shadow: none;
+  transform: none;
+  filter: none;
+}
+@media (hover: none), (pointer: coarse) {
+  .footer__devtag:hover { color: #CBD5E1; }
+  html[data-theme="light"] .footer__devtag:hover { color: #334155; }
+  .footer__devtag:hover .footer__dev-glow { opacity: .5; }
+}
+
 .footer__devtag::before {
   content: "";
   position: absolute;
@@ -438,18 +458,25 @@ html[data-theme="light"] .footer__dev-ripples::before {
   transition: transform 560ms cubic-bezier(.16, 1.56, .3, 1), color 240ms ease;
 }
 
-/* Radius + exterior gap keeps both corner curves mathematically concentric. */
+/* Radius + exterior gap keeps both corner curves mathematically concentric.
+   The box is sized for the thickest stroke: border (transparent, masked out) + padding (the
+   visible ring) always add up to --devtag-stroke-max, so the inner edge never moves and the
+   ring thickens outward, away from the clipped ripples. At rest the visible ring is the same
+   30px pill (inset -4px, radius 14px) as before. */
 .footer__dev-glow {
+  --devtag-stroke: 1.5px;
+  --devtag-stroke-max: 3px;
   position: absolute;
   z-index: 0;
   top: 50%;
   bottom: auto;
-  right: -4px;
-  left: -4px;
-  height: 30px;
+  right: -5.5px;
+  left: -5.5px;
+  height: 33px;
   overflow: hidden;
-  padding: 1.5px;
-  border-radius: calc(var(--devtag-radius) + var(--devtag-glow-gap));
+  border: calc(var(--devtag-stroke-max) - var(--devtag-stroke)) solid transparent;
+  padding: var(--devtag-stroke);
+  border-radius: calc(var(--devtag-radius) + var(--devtag-glow-gap) + var(--devtag-stroke-max) - 1.5px);
   background: conic-gradient(from var(--dev-glow-spin),
     #2563EB 0deg, #06B6D4 46deg, #8B5CF6 92deg, #D946EF 138deg,
     #F43F5E 184deg, #F59E0B 230deg, #84CC16 274deg,
@@ -460,12 +487,16 @@ html[data-theme="light"] .footer__dev-ripples::before {
     drop-shadow(0 0 4px rgb(59 130 246 / .3))
     drop-shadow(0 0 8px rgb(139 92 246 / .12));
   transform: translateY(-50%);
-  -webkit-mask: linear-gradient(#000 0 0) content-box, linear-gradient(#000 0 0);
+  /* Ring = padding box minus content box; the transparent border band is never painted. */
+  -webkit-mask: linear-gradient(#000 0 0) content-box, linear-gradient(#000 0 0) padding-box;
   -webkit-mask-composite: xor;
-          mask: linear-gradient(#000 0 0) content-box, linear-gradient(#000 0 0);
+          mask: linear-gradient(#000 0 0) content-box, linear-gradient(#000 0 0) padding-box;
           mask-composite: exclude;
   transition:
     opacity 260ms ease,
+    /* Expressive stroke: padding and border trade width on one ease-in-out curve. */
+    padding 420ms cubic-bezier(.42, 0, .58, 1),
+    border-width 420ms cubic-bezier(.42, 0, .58, 1),
     right 560ms cubic-bezier(.16, 1.42, .3, 1),
     left 560ms cubic-bezier(.16, 1.42, .3, 1),
     height 560ms cubic-bezier(.16, 1.42, .3, 1),
@@ -486,6 +517,8 @@ html[data-theme="light"] .footer__dev-ripples::before {
   html[data-theme="light"] .footer__devtag:hover { color: #0F2A4D; }
   .footer__devtag:hover::before { opacity: .23; filter: blur(11px) saturate(1.1); animation-duration: 8s; }
   .footer__devtag:hover .footer__dev-glow {
+    /* The ring doubles outward; its inner edge stays 1.5px clear of the ripple clip. */
+    --devtag-stroke: var(--devtag-stroke-max);
     opacity: .78;
     filter:
       drop-shadow(0 0 5px rgb(59 130 246 / .34))
@@ -495,6 +528,24 @@ html[data-theme="light"] .footer__dev-ripples::before {
   .footer__devtag:hover .footer__dev-ripples::before { animation: devtag-ripple-hover 1.8s cubic-bezier(.45, 0, .2, 1) infinite; }
   .footer__devtag:hover .footer__dev-icon { transform: none; }
 }
+
+/* Vitrina táctil (public/js/public-app.js · initDevtagShowcase): en pantallas sin hover el mismo
+   efecto se muestra al llegar al pie y al tocar, durante la breve pausa antes de abrir el enlace.
+   Mismo trazo Expressive (1.5px → 3px, ease-in-out) y dos ciclos de ondas, nunca en bucle. Va antes
+   de :active para que la "gota" de pulsación siga mandando mientras el dedo está apoyado, y no
+   reintroduce fondo, sombra ni transform en el enlace. */
+.footer__devtag.is-showcase { color: #F8FAFC; }
+html[data-theme="light"] .footer__devtag.is-showcase { color: #0F2A4D; }
+.footer__devtag.is-showcase::before { opacity: .23; filter: blur(11px) saturate(1.1); animation-duration: 8s; }
+.footer__devtag.is-showcase .footer__dev-glow {
+  --devtag-stroke: var(--devtag-stroke-max);
+  opacity: .78;
+  filter:
+    drop-shadow(0 0 5px rgb(59 130 246 / .34))
+    drop-shadow(0 0 8px rgb(217 70 239 / .12));
+  animation-duration: 7s;
+}
+.footer__devtag.is-showcase .footer__dev-ripples::before { animation: devtag-ripple-hover 1.8s cubic-bezier(.45, 0, .2, 1) 2; }
 
 .footer__devtag:focus-visible {
   outline: 3px solid #60A5FA;
@@ -527,6 +578,9 @@ html[data-theme="light"] .footer__devtag:focus-visible { color: #0F2A4D; }
   right: -3px;
   left: -3px;
   height: 31px;
+  /* Pressed droplet keeps its original outer geometry: no reserved border band, 2px ring. */
+  --devtag-stroke: 2px;
+  border-width: 0;
   border-radius: 13px 15px 12px 14px / 14px 12px 15px 13px;
   opacity: .82;
   filter:
@@ -558,7 +612,8 @@ html[data-theme="light"] .footer__devtag:focus-visible { color: #0F2A4D; }
     transition-duration: .01ms !important;
   }
   .footer__devtag:active { transform: none; }
-  .footer__devtag:hover .footer__dev-ripples::before {
+  .footer__devtag:hover .footer__dev-ripples::before,
+  .footer__devtag.is-showcase .footer__dev-ripples::before {
     opacity: .34;
     transform: translate(-50%, -50%) scale(.95);
   }

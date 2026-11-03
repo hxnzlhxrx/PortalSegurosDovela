@@ -1677,6 +1677,25 @@ tr[data-table-state="loading"] td:last-child .table-skeleton { height: 20px; wid
 .theme-switch-slot .theme-switch__icon--sun { left: 19px; }
 .theme-switch-slot .theme-switch__icon--moon { left: 59px; }
 
+/* Centrado exacto en ambas posiciones finales. Los valores fijos de arriba suponen un borde de
+   1px exacto, pero con escalado de pantalla (125 %, 150 %) el navegador redondea el borde a píxeles
+   del dispositivo (~0.67–0.8px) y el círculo quedaba desplazado arriba-izquierda y, al final del
+   recorrido, más pegado a un lado. Con el track como contenedor, cqw/cqh miden su interior real:
+   círculo = alto interior − 2×3px (mismo margen arriba, abajo y a los lados) y
+   recorrido = ancho interior − alto interior. theme.js mide el mismo recorrido para el arrastre. */
+@supports (container-type: size) {
+    .theme-switch-slot .theme-switch__track {
+        container-type: size;
+        --theme-thumb-end: calc(100cqw - 100cqh);
+    }
+    .theme-switch-slot .theme-switch__thumb {
+        width: calc(100cqh - 6px);
+        height: calc(100cqh - 6px);
+    }
+    .theme-switch-slot .theme-switch__icon--sun { left: calc(100cqh / 2); }
+    .theme-switch-slot .theme-switch__icon--moon { left: calc(100cqw - 100cqh / 2); }
+}
+
 /* En el login el panel es claro en modo claro: usar superficies del tema. */
 .login-panel {
     padding-top: 68px;
@@ -2055,4 +2074,109 @@ tr[data-table-state="loading"] td:last-child .table-skeleton { height: 20px; wid
 .tabla-freeze input:not([type="checkbox"]) {
     width: 100%;
     min-width: 140px;
+}
+
+/* CMS: traducciones de la novedad (interno/js/interno-traductor.js) */
+#modal-banner .modal {
+    max-height: calc(100vh - 32px);
+    overflow: auto;
+}
+@supports (height: 100dvh) {
+    #modal-banner .modal { max-height: calc(100dvh - 32px); }
+}
+
+.cms-trad {
+    margin: 0 0 14px;
+    border: 1px solid var(--border-subtle);
+    border-radius: 12px;
+}
+
+.cms-trad > summary {
+    display: flex;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: 8px;
+    min-height: 44px;
+    padding: 10px 14px;
+    font-weight: 700;
+    cursor: pointer;
+}
+
+.cms-trad > summary:focus-visible {
+    outline: 3px solid var(--brand-secondary);
+    outline-offset: 2px;
+    border-radius: 12px;
+}
+
+.cms-trad-codigos {
+    color: var(--text-secondary);
+    font-size: 12px;
+    letter-spacing: .06em;
+}
+
+.cms-trad-resumen {
+    margin-left: auto;
+    color: var(--text-secondary);
+    font-size: 12px;
+    font-weight: 600;
+}
+
+.cms-trad[open] > summary { border-bottom: 1px solid var(--border-subtle); }
+.cms-trad > .ayuda, .cms-trad-grid, .cms-trad-acciones { margin-inline: 14px; }
+.cms-trad > .ayuda { margin-top: 10px; }
+
+.cms-trad-grid {
+    display: grid;
+    gap: 12px;
+}
+
+.cms-trad-idioma {
+    margin: 0;
+    padding: 10px 12px 2px;
+    border: 1px solid var(--border-subtle);
+    border-radius: 10px;
+}
+
+.cms-trad-idioma legend {
+    padding: 0 6px;
+    font-size: 12px;
+    font-weight: 700;
+    letter-spacing: .04em;
+}
+
+.cms-trad-acciones {
+    display: flex;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: 10px;
+    margin-block: 12px 14px;
+}
+
+.cms-trad-estado {
+    color: var(--text-secondary);
+    font-size: 12.5px;
+}
+
+.cms-trad-estado[data-tono="error"] { color: var(--error); }
+
+.cms-idiomas {
+    display: inline-flex;
+    gap: 4px;
+    margin-top: 6px;
+}
+
+.cms-idiomas span {
+    padding: 1px 6px;
+    border: 1px solid var(--border-subtle);
+    border-radius: 999px;
+    color: var(--text-secondary);
+    font-size: 10.5px;
+    font-weight: 700;
+    letter-spacing: .04em;
+}
+
+.cms-idiomas span[data-ok] {
+    border-color: transparent;
+    background: var(--brand-secondary);
+    color: var(--surface-elevated);
 }

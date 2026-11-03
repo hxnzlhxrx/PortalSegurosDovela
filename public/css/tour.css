@@ -1,27 +1,57 @@
-/* Tutorial en modal compartido por el portal público y el interno (public/js/tour.js).
-   Superficie propia: no depende de las hojas de estilo de cada portal. */
+/* Tutorial a pantalla completa compartido por el portal público y el interno (public/js/tour.js).
+   Superficie propia: no depende de las hojas de estilo de cada portal.
+   Ocupa todo el viewport con un margen de 16 px (celular), 24 px (tableta) o 32 px (escritorio). */
 .tour-dialog {
-  width: min(calc(100% - 2rem), 36rem);
-  max-height: min(92dvh, 46rem);
-  margin: auto;
-  padding: clamp(1.25rem, 4vw, 2.1rem);
-  overflow: auto;
+  --tour-gap: 16px;
+  --tour-pad: clamp(14px, 2.6vw, 40px);
+  position: fixed;
+  inset: var(--tour-gap);
+  width: auto;
+  height: auto;
+  max-width: none;
+  max-height: none;
+  margin: 0;
+  padding: var(--tour-pad);
+  overflow: hidden;
   border: 1px solid rgb(var(--brand-secondary-rgb) / .25);
   border-radius: 28px;
   background: linear-gradient(145deg, var(--surface-elevated), var(--surface-tint));
   color: var(--text-primary);
   box-shadow: 0 30px 90px rgb(var(--brand-primary-deep-rgb) / .36);
 }
+/* Fondo translúcido: el portal se ve detrás, desenfocado, sin restar legibilidad al contenido. */
+@supports (background: color-mix(in srgb, red 50%, transparent)) and ((backdrop-filter: blur(1px)) or (-webkit-backdrop-filter: blur(1px))) {
+  .tour-dialog {
+    background: linear-gradient(145deg,
+      color-mix(in srgb, var(--surface-elevated) 84%, transparent),
+      color-mix(in srgb, var(--surface-tint) 76%, transparent));
+    backdrop-filter: blur(28px) saturate(1.3);
+    -webkit-backdrop-filter: blur(28px) saturate(1.3);
+  }
+  /* La miniatura y el consejo conservan una base sólida para leerse sobre cualquier fondo. */
+  .tour-dialog .tour-tip { background: color-mix(in srgb, var(--surface-elevated) 70%, transparent); }
+}
+@media (min-width: 601px) { .tour-dialog { --tour-gap: 24px; } }
+@media (min-width: 1024px) { .tour-dialog { --tour-gap: 32px; } }
+.tour-dialog[open] {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr);
+  grid-template-rows: auto auto minmax(0, 1fr) auto;
+  grid-template-areas: "head" "shot" "body" "foot";
+  row-gap: clamp(.75rem, 1.8vh, 1.4rem);
+}
 .tour-dialog::backdrop {
-  background: rgb(var(--brand-primary-deep-rgb) / .72);
-  backdrop-filter: blur(8px);
-  -webkit-backdrop-filter: blur(8px);
+  background: rgb(var(--brand-primary-deep-rgb) / .28);
 }
 .tour-dialog[open] { animation: tour-dialog-in 240ms var(--ease-enter, ease-out) both; }
 @keyframes tour-dialog-in {
   from { opacity: 0; transform: translateY(12px) scale(.985); }
   to { opacity: 1; transform: none; }
 }
+.tour-dialog [hidden] { display: none !important; }
+
+/* Cabecera: contador a la izquierda; tema y cerrar a la derecha. */
+.tour-dialog .tour-head { grid-area: head; align-items: center; }
 .tour-eyebrow {
   margin: 0;
   color: var(--brand-secondary);
@@ -29,24 +59,217 @@
   letter-spacing: .13em;
   text-transform: uppercase;
 }
+.tour-tools { display: inline-flex; align-items: center; gap: .6rem; flex: none; }
+.tour-close {
+  display: grid; place-items: center;
+  width: 44px; height: 44px;
+  padding: 0;
+  border: 1px solid rgb(var(--brand-secondary-rgb) / .3);
+  border-radius: 999px;
+  background: transparent;
+  color: var(--text-primary);
+  cursor: pointer;
+  transition: background-color 160ms var(--ease-enter, ease-out), border-color 160ms var(--ease-enter, ease-out);
+}
+.tour-close svg { width: 20px; height: 20px; fill: none; stroke: currentColor; stroke-width: 2; stroke-linecap: round; }
+.tour-close:hover { border-color: var(--brand-secondary); background: rgb(var(--brand-secondary-rgb) / .1); }
+.tour-close:focus-visible { outline: 3px solid var(--brand-secondary); outline-offset: 2px; }
+
+/* Miniatura: tan grande como permita su celda, sin perder la proporción 16:9. */
+.tour-shot {
+  grid-area: shot;
+  display: grid;
+  place-items: center;
+  min-width: 0;
+  margin: 0;
+  /* Una o dos columnas: la miniatura nunca pasa del ~40 % del alto disponible. */
+  width: min(100%, calc((100vh - 2 * var(--tour-gap)) * .4 * 16 / 9));
+  justify-self: center;
+}
+@supports (height: 100dvh) {
+  .tour-shot { width: min(100%, calc((100dvh - 2 * var(--tour-gap)) * .4 * 16 / 9)); }
+}
+.tour-shot .ts-screen { width: 100%; container-type: inline-size; }
+
+/* Contenido del paso: título, explicación, lista de funciones y consejo. Desplaza solo si hace falta. */
+.tour-body {
+  grid-area: body;
+  min-height: 0;
+  overflow: auto;
+  overscroll-behavior: contain;
+  scrollbar-width: thin;
+  scrollbar-color: rgb(var(--brand-secondary-rgb) / .35) transparent;
+  padding-right: 4px;
+}
+.tour-body::-webkit-scrollbar { width: 6px; }
+.tour-body::-webkit-scrollbar-thumb { border-radius: 999px; background: rgb(var(--brand-secondary-rgb) / .35); }
+.tour-chapter {
+  margin: 0 0 .45rem;
+  color: var(--text-muted);
+  font: 700 .78rem/1.3 var(--font-ui, sans-serif);
+  letter-spacing: .08em;
+  text-transform: uppercase;
+}
 .tour-dialog h2 {
-  margin: 0 0 .5rem;
+  margin: 0 0 .6rem;
   color: var(--text-primary);
   font-family: var(--font-display, serif);
-  font-size: clamp(1.4rem, 4vw, 1.85rem);
-  line-height: 1.15;
+  font-size: clamp(1.35rem, 1rem + 1.6vw, 2.5rem);
+  line-height: 1.12;
+  text-wrap: balance;
 }
 .tour-dialog p { line-height: 1.6; }
-.tour-actions { display: flex; flex-wrap: wrap; gap: .75rem; margin-top: 1.3rem; }
+.tour-text {
+  max-width: 62ch;
+  margin: 0;
+  color: var(--text-muted);
+  font-size: clamp(.95rem, .9rem + .25vw, 1.12rem);
+}
+.tour-points {
+  display: grid;
+  gap: .55rem;
+  max-width: 62ch;
+  margin: 1.1rem 0 0;
+  padding: 0;
+  list-style: none;
+}
+.tour-points li {
+  display: grid;
+  grid-template-columns: 1.5rem minmax(0, 1fr);
+  gap: .6rem;
+  align-items: start;
+  color: var(--text-primary);
+  font-size: clamp(.92rem, .88rem + .2vw, 1.05rem);
+  line-height: 1.5;
+}
+.tour-points svg {
+  width: 1.5rem; height: 1.5rem;
+  padding: .3rem;
+  border-radius: 999px;
+  background: rgb(var(--brand-secondary-rgb) / .14);
+  fill: none; stroke: var(--brand-secondary); stroke-width: 2.6; stroke-linecap: round; stroke-linejoin: round;
+}
+.tour-tip {
+  display: flex;
+  gap: .65rem;
+  align-items: flex-start;
+  max-width: 62ch;
+  margin: 1.15rem 0 0;
+  padding: .8rem 1rem;
+  border: 1px dashed rgb(var(--brand-secondary-rgb) / .4);
+  border-radius: 14px;
+  background: rgb(var(--brand-secondary-rgb) / .07);
+  color: var(--text-primary);
+  font-size: .95rem;
+  line-height: 1.5 !important;
+}
+.tour-tip svg { flex: none; width: 1.3rem; height: 1.3rem; margin-top: .05rem; fill: none; stroke: var(--brand-secondary); stroke-width: 1.9; stroke-linecap: round; stroke-linejoin: round; }
+.tour-tip__label { color: var(--brand-secondary); }
+
+/* Pie: barra de pasos (cada punto lleva a su paso) y botones. Siempre visible. */
+.tour-foot {
+  grid-area: foot;
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: .75rem 1.25rem;
+  padding-top: clamp(.7rem, 1.6vh, 1.1rem);
+  border-top: 1px solid rgb(var(--brand-secondary-rgb) / .16);
+}
+.tour-dots { display: flex; flex-wrap: wrap; align-items: center; gap: 2px; margin: 0 -8px; }
+.tour-dots button {
+  position: relative;
+  width: 24px; height: 24px;
+  padding: 0;
+  border: 0;
+  background: transparent;
+  cursor: pointer;
+}
+.tour-dots button::before {
+  content: "";
+  position: absolute;
+  inset: 8px;
+  border-radius: 999px;
+  background: rgb(var(--brand-secondary-rgb) / .28);
+  transition: background-color 200ms var(--ease-enter, ease-out), inset 200ms var(--ease-enter, ease-out);
+}
+.tour-dots button:hover::before { background: rgb(var(--brand-secondary-rgb) / .55); }
+.tour-dots button[aria-current="step"] { width: 34px; }
+.tour-dots button[aria-current="step"]::before { inset: 8px 4px; background: var(--brand-secondary); }
+.tour-dots button:focus-visible { outline: 3px solid var(--brand-secondary); outline-offset: -2px; border-radius: 999px; }
+.tour-actions { display: flex; flex-wrap: wrap; align-items: center; gap: .75rem; margin-left: auto; }
 .tour-actions .btn { min-height: 46px; justify-content: center; }
+.tour-nav { display: flex; gap: .75rem; }
+.tour-nav [data-tour="next"] { min-width: 8.5rem; }
+.tour-prev { gap: .4rem; }
+.tour-prev__arrow { display: none; }
+
+/* Escritorio y pantallas bajas y anchas: miniatura a la izquierda, contenido a la derecha. */
+@media (min-width: 1024px), (orientation: landscape) and (max-height: 540px) and (min-width: 601px) {
+  .tour-dialog[open] {
+    grid-template-columns: minmax(0, 1.45fr) minmax(20rem, 1fr);
+    grid-template-rows: auto minmax(0, 1fr) auto;
+    grid-template-areas: "head head" "shot body" "foot foot";
+    column-gap: clamp(1.5rem, 3vw, 3.5rem);
+  }
+  /* La celda manda: la miniatura usa el ancho de la columna o el alto de la fila, lo que se agote antes. */
+  .tour-shot { width: 100%; height: 100%; container-type: size; }
+  .tour-shot .ts-screen { width: min(100cqw, calc((100cqh - 26px) * 16 / 9)); }
+  .tour-body { align-self: stretch; display: flex; flex-direction: column; justify-content: safe center; }
+}
+@media (orientation: landscape) and (max-height: 540px) and (min-width: 601px) {
+  .tour-dialog { --tour-gap: 12px; --tour-pad: 14px 20px; border-radius: 22px; }
+  .tour-dialog[open] { row-gap: .6rem; grid-template-columns: minmax(0, 1.1fr) minmax(16rem, 1fr); }
+  .tour-dialog h2 { font-size: 1.3rem; }
+  .tour-text, .tour-points li { font-size: .9rem; }
+  .tour-points { margin-top: .7rem; gap: .35rem; }
+  .tour-tip { margin-top: .7rem; padding: .55rem .8rem; font-size: .85rem; }
+  .tour-actions .btn { min-height: 42px; padding: .5rem .95rem; }
+}
+
+/* Celular vertical: botones en una sola fila (Anterior queda como flecha) y textos compactos. */
 @media (max-width: 600px) {
-  .tour-dialog { width: min(calc(100% - 1.25rem), 36rem); border-radius: 22px; }
+  .tour-dialog { border-radius: 22px; }
+  .tour-dialog[open] { row-gap: .7rem; }
+  .ts-chrome { padding: 5px 8px; }
+  .ts-chrome i { width: 6px; height: 6px; }
+  .tour-close { width: 40px; height: 40px; }
+  .tour-tools { gap: .4rem; }
+  .tour-tip { font-size: .88rem; padding: .65rem .8rem; }
+  .tour-foot { gap: .55rem; }
+  .tour-dots { width: 100%; justify-content: center; margin: 0; }
+  .tour-actions { width: 100%; flex-wrap: nowrap; gap: .5rem; margin-left: 0; }
+  .tour-actions .btn { min-height: 44px; padding: .55rem .95rem; }
+  .tour-nav { flex: 1 1 auto; justify-content: flex-end; gap: .5rem; }
+  .tour-nav .btn { flex: 0 1 auto; }
+  .tour-actions .tour-skip { flex: 0 1 auto; padding-inline: .4rem; }
+  .tour-actions .tour-prev { width: 44px; min-width: 44px; padding: 0; }
+  .tour-prev__arrow { display: inline; font-size: 1.15rem; line-height: 1; }
+  .tour-prev__label { position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap; }
+  .tour-nav [data-tour="next"] { min-width: 7.5rem; }
+}
+@media (max-width: 340px) {
+  .tour-actions { flex-wrap: wrap; }
+  .tour-nav { flex-basis: 100%; }
+  .tour-nav [data-tour="next"] { flex: 1; }
 }
 @media (prefers-reduced-motion: reduce) {
   .tour-dialog[open] { animation: none; }
+  .tour-dots button::before, .tour-close { transition: none; }
 }
-@media (prefers-reduced-transparency: reduce) {
-  .tour-dialog::backdrop { backdrop-filter: none; -webkit-backdrop-filter: none; }
+/* Quien pide menos transparencia o alto contraste recibe el modal sólido, como antes. */
+@media (prefers-reduced-transparency: reduce), (prefers-contrast: more) {
+  .tour-dialog {
+    background: linear-gradient(145deg, var(--surface-elevated), var(--surface-tint));
+    backdrop-filter: none;
+    -webkit-backdrop-filter: none;
+  }
+  .tour-dialog::backdrop { background: rgb(var(--brand-primary-deep-rgb) / .72); }
+}
+@media (forced-colors: active) {
+  .tour-dots button::before { background: ButtonText; }
+  .tour-dots button[aria-current="step"]::before { background: Highlight; }
 }
 
 @font-face {
@@ -65,7 +288,6 @@
 html[data-theme="light"] .tour-dialog { --tour-ink: #C2410C; --tour-marker: rgb(250 204 21 / .55); }
 
 /* Miniatura del sitio: un lienzo de 320×180 unidades que escala como una imagen. */
-.tour-shot { margin: .2rem 0 1.15rem; container-type: inline-size; }
 .ts-screen {
   overflow: hidden;
   border: 1px solid rgb(var(--brand-secondary-rgb) / .22);
@@ -172,33 +394,9 @@ html[data-theme="light"] .tour-dialog { --tour-ink: #C2410C; --tour-marker: rgb(
   to { opacity: 1; transform: rotate(var(--r, -3deg)); }
 }
 
-/* Reserva dos o tres líneas para que los botones no salten entre pasos. */
-.tour-text { min-height: 4.8em; min-height: 3.2lh; margin: 0; color: var(--text-muted); }
-.tour-dots { display: flex; gap: .4rem; margin-top: 1.1rem; }
-.tour-dots span {
-  width: 8px;
-  height: 8px;
-  border-radius: 999px;
-  background: rgb(var(--brand-secondary-rgb) / .25);
-  transition: width 200ms var(--ease-enter, ease-out), background-color 200ms var(--ease-enter, ease-out);
-}
-.tour-dots span[data-active="true"] { width: 22px; background: var(--brand-secondary); }
-.tour-actions { justify-content: space-between; align-items: center; }
-.tour-nav { display: flex; gap: .75rem; }
-.tour-nav [hidden] { display: none; }
-@media (max-width: 600px) {
-  .tour-nav { width: 100%; }
-  .tour-nav .btn { flex: 1; }
-  .tour-skip { order: 2; }
-}
-@media (prefers-reduced-motion: reduce) {
-  .tour-dots span { transition: none; }
-}
-
 /* Cabecera de los modales de idioma y tutorial: contenido a la izquierda, interruptor claro/oscuro a la derecha. */
 .dialog-head { display: flex; align-items: flex-start; justify-content: space-between; gap: 1rem; }
 .dialog-head :is(.language-dialog__eyebrow, .tour-eyebrow) { align-self: center; }
-.tour-dialog .dialog-head { margin-bottom: .55rem; }
 
 /* Miniaturas del portal interno: menú lateral, filtros, estados de SLA y pestañas. */
 .ts-side {
@@ -294,98 +492,80 @@ html[data-theme="light"] .tour-dialog { --tour-ink: #C2410C; --tour-marker: rgb(
   .sidebar .btn-como-funciona { transition: none; }
 }
 
-/* ---------- Adaptable a cualquier pantalla, sin barra de desplazamiento ----------
-   La miniatura se ajusta a la altura disponible: su ancho es el menor entre el ancho del modal y
-   (alto máximo del modal − espacio de cabecera, texto y botones) × 16/9. Así todo el contenido cabe
-   en pantallas medianas, bajas y en celulares; la barra fina solo aparece en casos extremos. */
-.tour-dialog {
-  --tour-max-h: min(92vh, 46rem);
-  --tour-reserve: 25.5rem;
-  scrollbar-width: thin;
-  scrollbar-color: rgb(var(--brand-secondary-rgb) / .35) transparent;
+/* Piezas de las miniaturas del recorrido completo (portal público e interno). */
+.ts-panel--tight { padding-block: calc(var(--u) * 5); gap: calc(var(--u) * 3); }
+.ts-option { gap: calc(var(--u) * 3); }
+.ts-option b { font-size: calc(var(--u) * 5.4); line-height: 1.15; }
+.ts-option--on { border-color: var(--brand-secondary); box-shadow: inset 0 0 0 1px var(--brand-secondary); background: rgb(var(--brand-secondary-rgb) / .1); }
+.ts-doc {
+  display: flex; flex-direction: row; align-items: center; gap: calc(var(--u) * 4);
+  padding: calc(var(--u) * 3) calc(var(--u) * 5);
+  border: 1px solid rgb(var(--brand-secondary-rgb) / .2);
+  border-radius: calc(var(--u) * 5);
+  background: var(--surface-raised);
 }
-@supports (height: 100dvh) {
-  .tour-dialog { --tour-max-h: min(92dvh, 46rem); max-height: var(--tour-max-h); }
+.ts-canvas > .ts-doc { flex-direction: row; }
+.ts-doc .ts-ico { flex: none; width: calc(var(--u) * 14); height: calc(var(--u) * 14); }
+.ts-doc__txt { display: flex; flex-direction: column; gap: calc(var(--u) * 1.5); flex: 1; min-width: 0; }
+.ts-doc__txt b { overflow: hidden; font-size: calc(var(--u) * 5.2); text-overflow: ellipsis; white-space: nowrap; }
+.ts-doc__txt small { color: var(--text-muted); letter-spacing: 0; font-weight: 600; }
+.ts-doc .ts-badge { flex: none; display: grid; place-items: center; padding: calc(var(--u) * 1.5); }
+.ts-doc .ts-badge svg { width: calc(var(--u) * 6); height: calc(var(--u) * 6); stroke-width: 3; }
+.ts-drop svg { width: calc(var(--u) * 14); height: calc(var(--u) * 14); }
+.ts-drop { gap: calc(var(--u) * 2); align-content: center; }
+.ts-progress { display: block; overflow: hidden; border-radius: 99px; background: rgb(var(--brand-secondary-rgb) / .16); }
+.ts-progress i { display: block; height: 100%; border-radius: inherit; background: linear-gradient(90deg, var(--brand-secondary), var(--verde, #16A34A)); }
+.ts-qrbox { display: grid; place-items: center; padding: calc(var(--u) * 3); border-radius: calc(var(--u) * 4); background: #FFF; color: #0A1222; }
+.ts-canvas svg.ts-qr { width: 100%; height: 100%; fill: currentColor; stroke: none; }
+.ts-legend { gap: calc(var(--u) * 4); padding: calc(var(--u) * 7) calc(var(--u) * 6); font-size: calc(var(--u) * 5); color: var(--text-muted); }
+.ts-legend span { display: flex; align-items: baseline; gap: calc(var(--u) * 2.5); white-space: nowrap; }
+.ts-legend b { min-width: calc(var(--u) * 18); color: var(--brand-secondary); font: 700 calc(var(--u) * 6.4)/1 ui-monospace, "SFMono-Regular", Consolas, monospace; }
+.ts-timeline { gap: calc(var(--u) * 4); padding-left: calc(var(--u) * 6); border-left: 1px solid rgb(var(--brand-secondary-rgb) / .35); font-size: calc(var(--u) * 4.8); color: var(--text-muted); }
+.ts-timeline span { position: relative; }
+.ts-timeline span::before { content: ""; position: absolute; left: calc(var(--u) * -8.2); top: calc(var(--u) * 1); width: calc(var(--u) * 4.4); height: calc(var(--u) * 4.4); border-radius: 50%; background: rgb(var(--brand-secondary-rgb) / .4); }
+.ts-timeline span[data-on] { color: var(--text-primary); font-weight: 700; }
+.ts-timeline span[data-on]::before { background: #F59E0B; }
+.ts-area b { color: var(--text-primary); font-size: calc(var(--u) * 5); }
+.ts-formcard { gap: calc(var(--u) * 3.5); }
+.ts-formcard b { font: 600 calc(var(--u) * 7)/1.15 var(--font-display, serif); }
+.ts-btns { display: flex; gap: calc(var(--u) * 3); margin-top: auto; }
+.ts-btns .ts-btn { padding: calc(var(--u) * 2.5) calc(var(--u) * 6); font-size: calc(var(--u) * 4.6); }
+.ts-banner {
+  gap: calc(var(--u) * 4);
+  padding: calc(var(--u) * 10) calc(var(--u) * 12);
+  border-radius: calc(var(--u) * 7);
+  background: linear-gradient(128deg, var(--brand-primary-deep, #0A1222), var(--brand-primary) 62%, #264A75);
+  color: #F8FAFC;
 }
-.tour-dialog::-webkit-scrollbar { width: 6px; }
-.tour-dialog::-webkit-scrollbar-track { margin-block: 22px; background: transparent; }
-.tour-dialog::-webkit-scrollbar-thumb { border-radius: 999px; background: rgb(var(--brand-secondary-rgb) / .35); }
-.tour-shot {
-  width: min(100%, max(11rem, calc((var(--tour-max-h) - var(--tour-reserve)) * 16 / 9)));
-  margin-inline: auto;
-}
-.tour-prev { gap: .4rem; }
-.tour-prev__arrow { display: none; }
-
-@media (max-height: 760px) {
-  .tour-dialog { --tour-reserve: 23.5rem; padding: 1.35rem 1.6rem; }
-  .tour-dialog .dialog-head { margin-bottom: .4rem; }
-  .tour-shot { margin-bottom: .9rem; }
-  .tour-dialog h2 { font-size: clamp(1.3rem, 3.4vw, 1.6rem); margin-bottom: .35rem; }
-  .tour-dots { margin-top: .8rem; }
-  .tour-actions { margin-top: .9rem; }
-}
-
-/* Celular vertical: botones en una sola fila (Anterior queda como flecha) y textos compactos. */
-@media (max-width: 600px) {
-  .tour-dialog {
-    --tour-max-h: calc(100vh - 1.25rem);
-    --tour-reserve: 22rem;
-    padding: 1.1rem 1.1rem 1.2rem;
-  }
-  @supports (height: 100dvh) {
-    .tour-dialog { --tour-max-h: calc(100dvh - 1.25rem); }
-  }
-  .tour-dialog .dialog-head { margin-bottom: .35rem; }
-  .ts-chrome { padding: 5px 8px; }
-  .ts-chrome i { width: 6px; height: 6px; }
-  .tour-shot { margin: .1rem auto .8rem; }
-  .tour-dialog h2 { font-size: 1.3rem; margin-bottom: .3rem; }
-  .tour-dialog .tour-text { font-size: .92rem; line-height: 1.5; }
-  .tour-dots { margin-top: .7rem; }
-  .tour-actions { flex-wrap: nowrap; gap: .5rem; margin-top: .85rem; }
-  .tour-actions .btn { min-height: 44px; padding: .55rem .95rem; }
-  .tour-nav { width: auto; flex: 1 1 auto; justify-content: flex-end; gap: .5rem; }
-  .tour-nav .btn { flex: 0 1 auto; }
-  .tour-actions .tour-skip { order: 0; flex: 0 1 auto; padding-inline: .4rem; }
-  .tour-actions .tour-prev { width: 44px; min-width: 44px; padding: 0; }
-  .tour-prev__arrow { display: inline; font-size: 1.15rem; line-height: 1; }
-  .tour-prev__label { position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap; }
-  .tour-nav [data-tour="next"] { min-width: 7.5rem; }
-}
-@media (max-width: 340px) {
-  .tour-actions { flex-wrap: wrap; }
-  .tour-nav { flex-basis: 100%; }
-  .tour-nav [data-tour="next"] { flex: 1; }
-}
-
-/* Pantallas bajas y anchas (celular horizontal, ventanas reducidas): miniatura a la izquierda,
-   texto y botones a la derecha. */
-@media (orientation: landscape) and (max-height: 540px) and (min-width: 601px) {
-  .tour-dialog {
-    --tour-max-h: calc(100vh - 1rem);
-    --tour-reserve: 8.5rem;
-
-    width: min(calc(100% - 1.5rem), 54rem);
-    padding: 1rem 1.35rem;
-    border-radius: 22px;
-  }
-  @supports (height: 100dvh) {
-    .tour-dialog { --tour-max-h: calc(100dvh - 1rem); }
-  }
-  .tour-dialog[open] {
-    display: grid;
-    grid-template-columns: minmax(0, 1.15fr) minmax(0, 1fr);
-    grid-template-areas: "head head" "shot body";
-    column-gap: 1.35rem;
-    align-items: center;
-  }
-  .tour-dialog .dialog-head { grid-area: head; margin-bottom: .45rem; }
-  .tour-shot { grid-area: shot; margin: 0 auto; }
-  .tour-body { grid-area: body; min-width: 0; }
-  .tour-dialog h2 { font-size: 1.3rem; }
-  .tour-dialog .tour-text { font-size: .9rem; line-height: 1.5; min-height: 0; }
-  .tour-dots { margin-top: .7rem; }
-  .tour-actions { margin-top: .8rem; gap: .5rem; }
-  .tour-actions .btn { min-height: 42px; padding: .5rem .95rem; }
-}
+.ts-banner small { color: #93C5FD; }
+.ts-banner b { font: 600 calc(var(--u) * 11)/1.1 var(--font-display, serif); max-width: 80%; }
+.ts-banner .ts-bar { background: rgb(255 255 255 / .22); }
+.ts-banner .ts-btn { margin-top: auto; font-size: calc(var(--u) * 5); }
+.ts-dotsrow { flex-direction: row; align-items: center; gap: calc(var(--u) * 3); }
+.ts-canvas > .ts-dotsrow { flex-direction: row; }
+.ts-dotsrow i { width: calc(var(--u) * 4); height: calc(var(--u) * 4); border-radius: 99px; background: rgb(var(--brand-secondary-rgb) / .3); }
+.ts-dotsrow i[data-on] { width: calc(var(--u) * 11); background: var(--brand-secondary); }
+.ts-canvas > .ts-btn--ghost { font-size: calc(var(--u) * 4.6); }
+.ts-nav { padding: 0 calc(var(--u) * 12); justify-content: center; }
+.ts-nav .ts-logo img { width: calc(var(--u) * 50); }
+.ts-select--dark { border-color: rgb(255 255 255 / .3); background: rgb(255 255 255 / .1); color: #F8FAFC; }
+.ts-switch { display: block; border-radius: 99px; background: rgb(255 255 255 / .2); }
+.ts-switch i { position: absolute; top: 12%; left: 8%; width: calc(var(--u) * 12); height: 76%; border-radius: 50%; background: #FCD34D; }
+.ts-btn--light { background: rgb(255 255 255 / .14); color: #F8FAFC; font-size: calc(var(--u) * 4.4) !important; }
+.ts-device { padding: 0; overflow: hidden; }
+.ts-device > div { position: absolute; }
+.ts-device .ts-hero { padding: 0; border-radius: calc(var(--u) * 3); }
+.ts-device .ts-card { padding: 0; border-radius: calc(var(--u) * 3); }
+.ts-device--phone { border-width: calc(var(--u) * 1.6); border-color: rgb(var(--brand-secondary-rgb) / .4); border-radius: calc(var(--u) * 8); }
+/* Tablero y gráficas del portal interno. */
+.ts-chart { flex-direction: row; align-items: flex-end; gap: calc(var(--u) * 3); padding: calc(var(--u) * 6); }
+.ts-canvas > .ts-chart { flex-direction: row; }
+.ts-chart i { flex: 1; border-radius: calc(var(--u) * 1.5) calc(var(--u) * 1.5) 0 0; background: rgb(var(--brand-secondary-rgb) / .55); }
+.ts-chart i:nth-child(2n) { background: rgb(34 197 94 / .6); }
+.ts-sla { flex-direction: row; flex-wrap: wrap; gap: calc(var(--u) * 2.5); align-content: center; }
+.ts-canvas > .ts-sla { flex-direction: row; }
+/* Botones del lienzo con ícono: ícono y texto en una sola fila. */
+.ts-canvas > .ts-btn { display: flex; align-items: center; justify-content: center; white-space: nowrap; }
+.ts-sla .ts-chip { gap: calc(var(--u) * 2); color: var(--text-primary); font-size: calc(var(--u) * 5.4); }
+.ts-sla .ts-chip svg { width: calc(var(--u) * 6.5); height: calc(var(--u) * 6.5); color: var(--brand-secondary); }
+.ts-sla { gap: calc(var(--u) * 3) calc(var(--u) * 7); }
